@@ -1,0 +1,48 @@
+{
+  "@context": {
+    "schema": "http://schema.org/",
+    "mdml": "http://data.mohistory.org/mdml/",
+    "prov": "http://www.w3.org/ns/prov#",
+    "dc": "http://purl.org/dc/elements/1.1/"
+  },
+  "title": "DataSource",
+  "type": "object",
+  "properties": {
+    "@id": {
+      "type": "string"
+    },
+    "@type": {
+      "type": "array"
+    },
+    "schema:name": {
+      "description": "Name of Data Source",
+      "type": "string"
+    },
+    "schema:dateCreated": {
+      "description": "Date/time when sourceIndex was created",
+      "type": "string"
+    },
+    "mdml:endpointNS": {
+      "description": "URI of namespace for this endpoint",
+      "type": "string"
+    },
+    "mdml:sources": {
+       "description":"List of source URIs",
+       "type":"array"
+    },
+    "prov:wasAttributedTo": {
+      "description": "Contributor to data source",
+      "type": "string"
+    },
+    "dc:isPartOf": {
+      "description": "Use this if the data source is part of a larger data source or system",
+      "type": "string"
+    }
+  },
+  "required": [
+    "@id",
+    "@type",
+    "schema:name",
+    "mdml:sources"
+  ]
+}

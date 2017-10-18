@@ -1,0 +1,120 @@
+{
+	"schema:name": "mapToDPLA",
+	"@type": "mdml:jsonMapping",
+	"mdml:endpoint": "MOHUB/FRBSTL/FRASER/DPLA/",
+	"mdml:ServicePath": "http://data.mohistory.org/mdml/SERVICES/mdml/JSONMappingService",
+	"mdml:ServiceParams": {
+		"mdml:sourceEndpoint": "http://data.mohistory.org/mdml/ENDPOINTS/MOHUB/FRBSTL/FRASER/INCOMING/",
+		"mdml:mapVars": {
+			"recordPath": "sourceResource.originalRecord.mdml:payload.record.metadata.mods",
+            "endpointURI": {"map:endpointAsURI":[]},
+            "identifier": {"map:path": "sourceResource.originalRecord.mdml:payload.record.header.identifier"}
+		},
+		"mdml:resultType": {
+			"@id": "http://data.mohistory.org/MOHUB_MDML/schema/DPLAresource.json"
+		},
+		"mdml:map": {
+			"@context": "http://dp.la/api/items/context",
+			"dataProvider": "Federal Reserve Bank of St. Louis",
+			"@id": {
+				"map:getTargetID": []
+			},
+            		"hasView": {
+				"@id": {
+					"MHmap:findModsObjectInContext": {
+                    				"loc":{"map:path": "mapVar(recordPath).location"},
+                            			"urlPattern": "fraser.stlouisfed.org"
+                        		}
+				}
+			},
+			"object": {
+				"@id": {
+                			"MHmap:getMODSThumbnail": {
+                    				"loc": {"map:path": "mapVar(recordPath).location"},
+                        			"urlPattern": "scribdassets.com"
+                     			}
+				}
+			},
+			"aggregatedCHO": "#sourceResource",
+			"@type": "ore:Aggregation",
+			"ingestDate": {
+				"MHmap:getTimeStamp": "now"
+			},
+			"isShownAt": {
+				"@id": {
+                                        "MHmap:findModsObjectInContext": {
+ 	                               		"loc":{"map:path": "mapVar(recordPath).location"},
+        		               		"urlPattern": "fraser.stlouisfed.org"
+                        		}
+                                }
+			},
+			"provider": {
+				"@id": "http://dp.la/api/contributor/missouri-hub",
+				"name": "Missouri Hub"
+			},
+			"sourceResource": {
+				"publisher": {
+					"map:path": ["mapVar(recordPath).originInfo.publisher", "array"]
+				},
+				"creator": {
+					"map:path": ["mapVar(recordPath).name[?role.roleTerm=='creator'].namePart[0]", "array"]
+				},
+				"contributor": {
+					"map:path": ["mapVar(recordPath).name[?role.roleTerm=='contributor'].namePart[0]", "array"]
+				},
+				"description": {
+					"map:path": ["mapVar(recordPath).note[0].mdml:_TXT", "array"]
+				},
+				"language": {
+					"map:path": "mapVar(recordPath).language"
+				},
+				"rights": {
+					"map:path": ["mapVar(recordPath).accessCondition", "array"]
+				},
+				"typeOfResource": {
+					"map:path": ["mapVar(recordPath).typeOfResource", "string"]
+				},
+				"title": {
+                	"MHmap:getMODSTitle": {
+						"map:path": "mapVar(recordPath).titleInfo"
+                     }
+				},
+				"date": {
+					"MHmap:getDates": {
+						"map:path": "mapVar(recordPath).originInfo.sortDate"
+					}
+				},
+				"dateCreated": {
+					"MHmap:getDateCreated": {
+						"map:path": "mapVar(recordPath).originInfo.sortDate"
+					}
+				},
+				"relation": {
+					"map:path": ["mapVar(recordPath).relatedItem[0].titleInfo[0].title", "array"]
+				},
+				"stateLocatedIn": [{
+					"name": "Missouri"
+				}],
+				"identifier": {
+					"map:path": ["mapVar(recordPath).identifier.mdml:_TXT", "array"]
+				},
+				"type": {
+					"map:path": ["mapVar(recordPath).genre", "string"]
+				},
+				"subject": {
+					"MHmap:getMODSSubject": {
+                    	"map:path": "mapVar(recordPath).subject"
+                    }
+				},
+				"genre": {
+					"MHmap:getDPLAGenre": {
+						"map:path": "mapVar(recordPath).typeOfResource"
+					}
+				},
+				"ingestType": "item",
+				"_id": "mapVar(endpointURI):mapVar(identifier)",
+				"originalRecord": {}
+			}
+		}
+	}
+}       

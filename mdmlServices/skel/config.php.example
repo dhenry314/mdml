@@ -1,0 +1,20 @@
+<?php
+
+return array(
+	'JWT_SECRET' => 'some_secret',
+	'JWT_TTL_SECS' => 360000,
+	'JWT_ISSUER' => 'http://example.org/',
+	'BASE_PATH' => '/mdmlEndpoints/',
+        'namespaces' => array(
+                'mdml' => 'http://example.org/mdml/',
+                'sitemap' => 'http://www.sitemaps.org/schemas/sitemap/0.9',
+                'rs' => 'http://www.openarchives.org/rs/terms/'
+        ),
+	'auth' => array(
+                'loginService' => 'http://example.org/login/',
+                'username' => 'my_username',
+                'password' => 'my_password'
+        ),
+	'serviceDescription' => 'http://example.org/MYservices/description.json'
+);
+?>

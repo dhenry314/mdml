@@ -1,0 +1,49 @@
+{
+  "@context": {
+	"mdml": "http://data.mohistory.org/mdml/",
+	"schema": "http://schema.org/" 
+  },
+  "schema:name":"FRASER Digital Library",
+  "@id":"http://localhost/MOHUB/CONFIGS/FRBSTL/FRASER.json",
+  "@type":["mdml:Source"],
+  "foaf:project":"FRBSTL_FRASER",
+  "foaf:homepage":"https://fraser.stlouisfed.org/",
+  "mdml:endpoints": [
+		{
+			"@id": "http://localhost/mdml/ENDPOINTS/MOHUB/FRASER/INCOMING/",
+			"@type": ["mdml:EndpointDef"],
+			"mdml:sort":0,
+			"mdml:endpointNS": "MOHUB",
+			"mdml:endpointPath":"/FRASER/INCOMING/",
+			"mdml:processes": [
+				{
+					"@id": "mohub_frbstl_fraser_ingest",
+					"@type":"mdml:OAIingestRequest",
+					"schema:name": "ingest",
+					"mdml:ServicePath":"http://localhost/mdml/SERVICES/mdml/OAIingestor",
+					"mdml:ServiceParams": {
+							"path": "https://fraser.stlouisfed.org/oai",
+							"metadataPrefix": "mods"				
+					}
+				}
+			]
+		},
+		{
+			"@type": ["mdml:EndpointDef"],
+			"mdml:sort":1,
+			"mdml:endpointNS": "MOHUB",
+			"mdml:endpointPath":"/FRASER/DPLA/",
+			"mdml:processes": [
+				{
+					"schema:name": "mapToDPLA",
+					"@type":"mdml:jsonMapping",
+					"mdml:ServicePath":"http://localhost/mdml/SERVICES/mdml/JSONMapper",
+					"mdml:ServiceParams": {
+							"path": "https://fraser.stlouisfed.org/oai",
+							"metadataPrefix": "mods"				
+					}
+				}
+			]
+		}
+  ]
+}

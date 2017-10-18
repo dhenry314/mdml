@@ -1,0 +1,39 @@
+{
+	"@context": {
+		"mdml":"http://data.mohistory.org/mdml/",
+		"schema": "http://schema.org/",
+		"foaf":"http://xmlns.com/foaf/0.1/"
+	},
+    "@id":"http://localhost/MOHUB/RS/index.json",
+    "@type":["mdml:SourceDef"],
+	"schema:name":"Missouri Hub - a service hub of DPLA",
+	"foaf:project":"MOHUB",
+	"mdml:sources": [
+		{
+			"@id":"FRBSTL",
+			"@type":["mdml:SourceDef"],
+			"schema:name":"Federal Reserve Bank of Saint Louis",
+			"foaf:homepage":"https://www.stlouisfed.org/",
+			"foaf:project":"FRBSTL",
+			"mdml:sources": [
+				{
+					"@id":"http://localhost/MOHUB/CONFIGS/FRBSTL/FRASER.json",
+					"schema:name":"FRASER Digital Library"
+				}
+			]
+		},
+		{
+			"@id":"MHM",
+			"@type":["mdml:SourceDef"],
+			"schema:name":"Missouri History Museum",
+			"foaf:homepage":"http://www.mohistory.org/",
+			"foaf:project":"MHM",
+			"mdml:sources": [
+				{
+					"@id":"http://localhost/MOHUB/CONFIGS/MHM/ALL.json",
+					"schema:name":"MHM Digital Library"
+				}
+			]
+		}
+	]
+}

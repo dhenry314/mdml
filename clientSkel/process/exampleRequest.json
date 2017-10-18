@@ -1,0 +1,15 @@
+{
+    "serviceURI": "http://example.org/myServices/",
+    "service": {
+        "args": {
+            "mdml:originURI": "_currentOriginURI",
+            "mdml:sourceURI": "_currentSourceURI",
+	    "my:color": "blue"
+        },
+        "methodname": "exampleService",
+        "type": "jsonwsp/request",
+        "version": "1.0"
+    },
+    "sourceEndpoint": "http://example.org/myEndpoints/exampleEndpoint/resourcelist.xml",
+    "targetEndpoint": "http://example.org/myEndpointsV2/exampleTarget"
+}

@@ -1,0 +1,17 @@
+{
+        "title": "DataProvider",
+        "type": "object",
+        "properties": {
+                "@id": {
+                        "type": "string"
+                },
+                "@type": {
+                        "type": "array"
+                },
+                "foaf:name": {
+                        "description": "Name of Data Provider",
+                        "type": "string"
+                }
+        },
+        "required": ["@id", "@type", "foaf:name"]
+}

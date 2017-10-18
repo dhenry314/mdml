@@ -1,0 +1,14 @@
+{
+    "@context" : {
+        "foaf" : "http://xmlns.com/foaf/0.1/",
+        "prov" : "http://www.w3.org/ns/prov#",
+        "mdml" : "http://data.mohistory.org/vocab/mdml#"
+    },
+    "@id" : "http://data.mohistory.org/resource/mdml/DataProvider/MHM",
+    "@type" : [
+        "foaf:Organization",
+        "prov:Agent",
+        "mdml:DataProvider"
+    ],
+    "foaf:name" : "Missouri History Museum"
+}

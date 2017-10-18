@@ -1,0 +1,19 @@
+{
+	"@context": {
+		"mdml":"http://data.mohistory.org/ns/mdml/"
+	},
+	"mdml:mapServices": {
+		"MHSMap":"http://data.mohistory.org/MHSmdml/"
+	},
+	"mdml:mapVars": {
+		"test": {"MHSMap:getTest":
+				{
+					"param1":"path:content"
+				}
+			}
+	},
+	"test": "var:test",
+      	"createdOn": "path:dateCreated",
+      	"description": "path:content"
+}
+

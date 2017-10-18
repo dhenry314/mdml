@@ -1,0 +1,8 @@
+{
+"mdmlCore": "C:\\mdmlCore\\",
+"tokenService": "http://example.org/myEndpoints/login",
+"endpointsBase": "http://example.org/myEndpoints/",
+"servicesPath": "http://example.org/myServices/description.json",
+"processDir": "C:\\mdmlClient\\process\\",
+"logDir": "C:\\mdmlClient\\logs\\"
+}

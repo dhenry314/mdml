@@ -1,0 +1,11 @@
+{
+    "type": "jsonwsp/request",
+    "version": "1.0",
+    "methodname": "HelloWorld",
+    "args": {
+    	"yourName":"George"
+    },
+    "mirror": {
+        "id": 1
+    }
+}

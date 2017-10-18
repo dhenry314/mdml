@@ -1,0 +1,34 @@
+{
+  "@context": {
+    "schema": "http://schema.org/",
+    "mdml": "http://data.mohistory.org/mdml/"
+  },
+  "title": "EndpointDef",
+  "type": "object",
+  "properties": {
+    "@id": {
+      "type": "string"
+    },
+    "@type": {
+      "type": "array"
+    },
+    "schema:name": {
+      "description": "Name of Endpoint",
+      "type": "string"
+    },
+    "schema:dateCreated": {
+      "description": "Date/time when endpointDef was created",
+      "type": "string"
+    },
+    "mdml:endpoints": {
+      "description": "array of endpoints",
+      "type": "array"
+    }
+  },
+  "required": [
+    "@id",
+    "@type",
+    "schema:name",
+    "mdml:endpoints"
+  ]
+}

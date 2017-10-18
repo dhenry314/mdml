@@ -1,0 +1,37 @@
+{
+    "@context" :{
+        "foaf":"http://xmlns.com/foaf/0.1/",
+        "rel":"http://vocab.org/relationship/"
+    },
+    "title": "User",
+    "type": "object",
+    "properties": {
+            "@id": {
+                  "type": "string"
+            },
+            "@type": {
+                  "type": "array"
+            },
+            "foaf:name": {
+                  "description": "User Name",
+                  "type": "string"
+            },
+            "foaf:mbox": {
+                  "description": "User email address",
+                  "type": "string"
+            },
+            "foaf:firstName": {
+                  "description": "User first name",
+                  "type": "string"
+            },
+            "foaf:familyName": {
+                  "description": "User family name",
+                  "type": "string"
+            },
+            "rel:employedBy": {
+                   "description": "User employer",
+                   "type": "string"
+            }
+    },
+    "required": ["@id", "@type", "foaf:name"]
+}

@@ -1,0 +1,10 @@
+{
+  "@context":{
+       "mdml":"http://data.mohistory.org/ns/mdml/"
+  },
+  "mdml:mapPath": "http://data.mohistory.org/MHSmdml/maps/testMap.json",
+  "mdml:payload": {
+        "dateCreated": "20170-09-19",
+        "content": "Hello World"
+  }
+}

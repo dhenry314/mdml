@@ -1,0 +1,5 @@
+{
+	"mdml:processID":"DJH_20170707", /* a tag to identify log messages */
+	"mdml:originURL": "http://localhost/MOHUB/RS/index.json",  /* a web resolvable path to a source definition file */
+    "mdml:endpointFilters": ["*/INCOMING/*"]  /* an optional array of patterns to filter endpoint paths - only process those that match */
+}

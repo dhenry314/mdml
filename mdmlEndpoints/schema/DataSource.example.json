@@ -1,0 +1,16 @@
+{
+	"@context":{
+		"foaf":"http://xmlns.com/foaf/0.1/",
+		"prov":"http://www.w3.org/ns/prov#",
+        "mdml":"http://data.mohistory.org/vocab/mdml#"
+	},
+	"@id": "http://data.mohistory.org/mdml/DataSource/MHM_Mimsy",
+	"@type": ["prov:Entity","mdml:DataSource"],
+	"foaf:name":"Mimsy Collection Management System",
+        "prov:wasAttributedTo":"http://data.mohistory.org/mdml/DataProvider/MHM",
+        "prov:qualifiedAttribution" : {
+           "@type": "prov:Attribution",
+           "prov:agent": "http://data.mohistory.org/mdml/DataProvider/MHM",
+           "mdml:hadRole": "owner"
+          }
+}

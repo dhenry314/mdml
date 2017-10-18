@@ -1,0 +1,14 @@
+{
+        "schema:name": "ingest",
+        "@type":"mdml:ESingest",
+        "mdml:endpoint": "MOHUB/MHM/ALL/INCOMING/",
+        "mdml:ServicePath":"http://data.mohistory.org/mdml/SERVICES/mdml/MHSingestor",
+        "mdml:ServiceParams": {
+             "path": "http://158.188.69.242",
+             "port": 9200,
+             "index": "ccsearchv2",
+	     "type": "record",
+             "query": "{ 'match_all': {} }"
+        }
+}
+

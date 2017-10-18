@@ -1,0 +1,39 @@
+{
+		"mappings": {
+			"resource": {
+				"properties": {
+					"mdml_endPoint": { "type":"string" },
+					"mdml_originURL": { "type":"string" },
+					"sm_resource_type": { "type":"string" },
+					"sm_lastmod": { "type": "date" },
+					"sm_loc": { "type":"string" },
+					"rs_md_hash": {
+						"index": "not_analyzed",
+						"type": "string",
+						"store": "yes"
+					},
+					"rs_md_change": { "type":"string" },
+					"rs_md_datetime": {
+						"type": "date"
+					},
+					"rs_md_capability": { "type":"string" },
+					"rs_md_path": { "type":"string" },
+					"rs_md_ln": {
+						"type": "object",
+							"properties": {
+								"rel": {
+									"index": "not_analyzed",
+									"type": "string",
+									"store": "yes"
+								},
+								"href": {
+									"index": "not_analyzed",
+									"type": "string",
+									"store": "yes"
+								}
+						}
+					}
+				}
+			}
+		}
+	}

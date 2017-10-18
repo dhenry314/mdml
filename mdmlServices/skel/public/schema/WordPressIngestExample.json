@@ -1,0 +1,14 @@
+{
+  "@context":{
+       "wp":"http://data.mohistory.org/ns/wordpress/",
+       "mdml":"http://data.mohistory.org/ns/mdml/"
+  },
+  "wp:sourceEndpoints": [ 
+     "http://data.mohistory.org/cms/wp-json/wp/v2/posts",
+     "http://data.mohistory.org/cms/wp-json/wp/v2/pages",
+     "http://data.mohistory.org/cms/wp-json/wp/v2/exhibits",
+     "http://data.mohistory.org/cms/wp-json/wp/v2/events",
+     "http://data.mohistory.org/cms/wp-json/wp/v2/presskits"
+  ],
+  "mdml:targetEndpoint":"http://data.mohistory.org/mdmlEndpointsV2/WPIngest"
+}

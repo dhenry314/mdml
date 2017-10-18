@@ -1,0 +1,12 @@
+{
+    "@context": {
+        "mdml": "http:\/\/data.mohistory.org\/mdml#"
+    },
+    "mdml:originURI": "http:\/\/data.mohistory.org\/example\/sourceA\/123459",
+    "mdml:sourceURI": "http:\/\/data.mohistory.org\/example\/sourceA\/123459",
+    "mdml:payloadSchema": "http://data.mohistory.org/files/testSchema.json",
+    "mdml:payload": {
+        "dateCreated": "2017-09-15",
+        "content": "whatever"
+    }
+}

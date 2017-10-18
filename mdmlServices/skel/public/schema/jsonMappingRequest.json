@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "properties": {
+    "mdml:map": {
+      "type": "object"
+    },
+    "mdml:mapPath": {
+      "type": "string"
+    },
+    "mdml:payload": {
+       "type": "object"
+    }
+  },
+  "required": ["mdml:payload"]
+}

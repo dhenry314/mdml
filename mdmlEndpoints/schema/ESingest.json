@@ -1,0 +1,59 @@
+{
+  "@context": {
+    "schema": "http://schema.org/",
+    "mdml": "http://data.mohistory.org/mdml/"
+  },
+  "title": "ESingest",
+  "type": "object",
+  "properties": {
+    "schema:name": {
+      "description": "Name of Data Source",
+      "type": "string"
+    },
+    "mdml:endpoint": {
+	"description": "Path to target endpoint",
+	"type": "string"
+    },
+    "mdml:ServicePath": {
+      "description": "Path to webservice",
+      "type": "string"
+    },
+    "mdml:ServiceParams": {
+                "description": "Params sent to webservice",
+        "type": "object",
+        "properties": {
+             "path": {
+               "description": "ElasticSearch endpoint",
+                 "type": "string"
+             },
+             "port": {
+               "description": "ElasticSearch endpoint port",
+                "type": "integer"
+             },
+	     "type": {
+		"description": "ElasticSearch document type",
+		"type": "string"
+	     },
+             "index": {
+              	"description": "ElasticSearch index",
+                "type": "string"
+             },
+	     "query": {
+		"description": "ElasticSearch query",
+		"type": "object"
+	     }
+        },
+        "required": [
+          "path",
+          "port",
+	  "type",
+          "index"
+        ]
+    }
+}, 
+  "required": [
+    "schema:name",
+    "mdml:ServicePath",
+    "mdml:ServiceParams"
+  ]
+}

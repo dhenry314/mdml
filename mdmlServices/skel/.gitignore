@@ -1,0 +1,7 @@
+/vendor/
+/cache/
+/config.php
+/Users.php
+/logs/*
+!/logs/README.md
+composer.lock

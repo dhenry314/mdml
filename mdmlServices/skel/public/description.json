@@ -1,0 +1,96 @@
+{
+    "@context": {
+	"mdml":"http://data.mohistory.org/ns/mdml/",
+	"wp": "http://data.mohistory.org/ns/wp/"
+    },
+    "type": "jsonwsp/description",
+    "version": "1.0",
+    "servicename": "MHSServices",
+    "url": "http://data.mohistory.org/MHSmdml/serviceCall",
+    "types": {
+        "MDMLPayloadResponse": {
+		 "mdml:sourceURI":"string",
+                 "mdml:originURI":"string",
+                 "mdml:payload":"object"
+        },
+	"HelloWorldResponse": {
+		"content":"string",
+		"dateResponded":"string"
+	}
+    },
+    "methods": {
+	"HelloWorld": {
+	    "doc_lines": ["A service for testing."],
+            "params": {
+                "yourName": {
+                    "def_order": 1,
+                    "doc_lines": ["Enter your name."],
+                    "type": "string",
+                    "optional": false
+                }
+            },
+            "ret_info": {
+                "doc_lines": ["The response should say hello to you."],
+                "type": ["HelloWorldResponse"]
+            }
+
+	},
+        "WordPressIngest": {
+            "doc_lines": ["Ingest records from a WordPress api."],
+            "params": {
+                "wp:sourceEndpoints": {
+                    "def_order": 1,
+                    "doc_lines": ["Array of WordPress api endpoints from which to pull records."],
+                    "type": "array",
+                    "optional": false
+                },
+		"mdml:targetEndpoint": {
+		    "def_order": 2,
+		    "doc_lines": ["The MDML endpoint that will accept records from the Wordpress api."],
+		    "type": "string",
+		    "optional": false	
+		}
+            },
+            "ret_info": {
+                "doc_lines": ["Standard MDML response with payload."],
+                "type": ["MDMLPayloadResponse"]
+            }
+        },
+        "mdml/jsonMapping": {
+            "doc_lines": ["Map a single json document with a given json map.",
+			  "Input can be either a path to a json document or  the input document itself.",
+			  "mdml:originURI can be used to keep track of a specific request."
+			],
+            "params": {
+		"mdml:mapPath": {
+			"def_order": 1,
+			"doc_lines": ["Web url to a json map."],
+			"type": "string",
+			"optional": false
+		},
+		"mdml:sourceURI": {
+			"def_order": 2,
+                        "doc_lines": ["Web url to input document."],
+                        "type": "string",
+                        "optional": true
+		},
+		"mdml:originURI": {
+			"def_order": 3,
+                        "doc_lines": ["Web url to original document before ingested to an MDML endpoint."],
+                        "type": "string",
+                        "optional": true
+		},
+		"mdml:inputDocument": {
+			"def_order": 4,
+			"doc_lines": ["JSON document to be mapped."],
+			"type": "object",
+			"optional": true
+		}
+ 	    },
+            "ret_info": {
+                "doc_lines": ["Standard MDML response with payload."],
+                "type": ["MDMLPayloadResponse"]
+            }
+        }
+    }
+}

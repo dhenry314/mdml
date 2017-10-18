@@ -1,0 +1,16 @@
+{
+  "description": "Ingest from a 'headless' WordPress API.",
+  "type": "object",
+  "required":["wp:sourceEndpoints","mdml:targetEndpoint"],
+  "properties": {
+    "wp:sourceEndpoints": {
+      "type": "array",
+      "item": {
+          "type":"string"
+      }
+    },
+    "mdml:targetEndpoint": {
+      "type": "string"
+    }
+  }
+}

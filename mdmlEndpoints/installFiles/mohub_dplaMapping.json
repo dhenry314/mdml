@@ -1,0 +1,144 @@
+{
+	"aliases": {},
+	"mappings": {
+		"dplaResource": {
+			"properties": {
+				"@context": {
+					"type": "string"
+				},
+				"@id": {
+					"type": "string"
+				},
+				"@type": {
+					"type": "string"
+				},
+				"aggregatedCHO": {
+					"type": "string"
+				},
+				"dataProvider": {
+					"type": "string"
+				},
+				"ingestDate": {
+                                        "type": "string"
+                                },
+				"hasView": {
+					"properties": {
+						"@id": {
+							"type": "string"
+						}
+					}
+				},
+				"isShownAt": {
+					"properties": {
+						"@id": {
+							"type": "string"
+						}
+					}
+				},
+				"object": {
+					"properties": {
+						"@id": {
+							"type": "string"
+						}
+					}
+				},
+				"provider": {
+					"properties": {
+						"@id": {
+							"type": "string"
+						},
+						"name": {
+							"type": "string"
+						}
+					}
+				},
+				"mdml:resource": {
+					"properties": {
+						"mdml_endpoint": {
+							"type": "string"
+						},
+						"rs_md_change": {
+							"type": "string"
+						},
+						"rs_md_datetime": {
+							"type": "date",
+							"format": "strict_date_optional_time||epoch_millis"
+						},
+						"rs_md_hash": {
+							"type": "string"
+						},
+						"sm_lastmod": {
+							"type": "date",
+							"format": "strict_date_optional_time||epoch_millis"
+						},
+						"sm_loc": {
+							"type": "string"
+						}
+					}
+				},
+				"sourceResource": {
+					"properties": {
+						"_id": {
+							"type": "string"
+						},
+						"contributor": {
+							"type": "array"
+						},
+						"creator": {
+							"type": "array"
+						},
+						"date": {
+							"type": "string"
+						},
+						"dateCreated": {
+							"type": "string"
+						},
+						"description": {
+							"type": "array"
+						},
+						"genre": {
+							"type": "array"
+						},
+						"identifier": {
+							"type": "array"
+						},
+						"ingestType": {
+							"type": "string"
+						},
+						"language": {
+							"type": "string"
+						},
+						"publisher": {
+							"type": "string"
+						},
+						"relation": {
+							"type": "array"
+						},
+						"rights": {
+							"type": "string"
+						},
+						"stateLocatedIn": {
+							"properties": {
+								"name": {
+									"type": "string"
+								}
+							}
+						},
+						"subject": {
+							"type": "array"
+						},
+						"title": {
+							"type": "array"
+						},
+						"type": {
+							"type": "string"
+						},
+						"typeOfResource": {
+							"type": "string"
+						}
+					}
+				}
+			}
+		}
+	}
+}

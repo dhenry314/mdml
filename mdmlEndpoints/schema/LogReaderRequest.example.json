@@ -1,0 +1,17 @@
+{
+	"count":100,
+	"offset":0,
+	"mdml:logQuery": {
+			/* any combination of the following fields could be used in a query for log messages.  When an asterix is used for the value, it will
+			be treated as a regex query*/
+			"mdml:processID" : "MOHUB_FRBSTL_FRASER_INCOMING__1499179441",
+			"mdml:endpoint" : "MOHUB/FRBSTL/FRASER/INCOMING/",
+			"mdml:logMsg" : "Upserted document.",
+			"mdml:logLevel" : "INFO",
+			"mdml:logTime" : 1499179606,
+			"mdml:originURL" : "*fraser.stlouisfed.org%3Atitle%3A1005"
+	},
+	"mdml:distinctField": "mdml:processID", /*optional*/
+	"mdml:countOnly": true,
+        "mdml:purgeByQuery": true
+}

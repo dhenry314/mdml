@@ -1,0 +1,49 @@
+{
+  "@context": {
+    "schema": "http://schema.org/",
+    "mdml": "http://data.mohistory.org/mdml/"
+  },
+  "title": "MappingRequest",
+  "type": "object",
+  "properties": {
+    "schema:name": {
+      "description": "Name of Data Source",
+      "type": "string"
+    },
+    "schema:dateCreated": {
+      "description": "Date/time when created",
+      "type": "string"
+    },
+    "mdml:ServicePath": {
+      "description": "Path to webservice",
+      "type": "string"
+    },
+    "mdml:ServiceParams": {
+                "description": "Params sent to webservice",
+        "type": "object",
+        "properties": {
+             "mdml:sourceEndpoint": {
+               "description": "Endpoint to use for source documents",
+                 "type": "string"
+             },
+	     "mdml:resultType": {
+		"description": "Type of resulting document.",
+		"type": "object"
+	     },
+             "mdml:map": {
+               "description": "Data map",
+                "type": "object"
+             }
+        },
+        "required": [
+          "mdml:sourceEndpoint",
+          "mdml:map"
+        ]
+    }
+}, 
+  "required": [
+    "schema:name",
+    "mdml:ServicePath",
+    "mdml:ServiceParams"
+  ]
+}

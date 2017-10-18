@@ -1,0 +1,19 @@
+{
+	"@context": {
+		"mdml": "http://data.mohistory.org/mdml/terms/",
+		"rs":"http://www.openarchives.org/rs/terms/"
+	},
+	"rs:url": {
+		"rs:loc": "http://data.mohistory.org/MHSexternal/SIERRA.CATALOG.BIBKEY:1347258",
+		"rs:md": {
+			"rs:hash": "md5:1e0d5cb8ef6ba40c99b14c0237be735e",
+			"rs:change": "created",
+			"rs:datetime": "2017-05-22T13:00:00Z"
+		}
+	},
+	"mdml:originURL":"http://data.mohistory.org/MHSexternal/SIERRA.CATALOG.BIBKEY:1347258",
+	"mdml:endPoint":"http://data.mohistory.org/mdml/endpoints/MHS/SIERRA/CATALOGUE",
+	"mdml:updatedOn":"2017-05-23T13:00:00Z",
+	"mdml:pipeline":"http://data.mohistory.org/MOHUB/pipelines/frbstl_fraser.json",
+	"mdml:pipelineStep":1
+}

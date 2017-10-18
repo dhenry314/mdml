@@ -1,0 +1,8 @@
+{
+"mdmlCore": "/usr/local/mdmlCore/",
+"tokenService": "http://example.org/myEndpoints/login",
+"endpointsBase": "http://example.org/myEndpoints/",
+"servicesPath": "http://example.org/myServices/description.json",
+"processDir": "/usr/local/mdmlClient/process/",
+"logDir": "/usr/local/mdmlClient/logs/"
+}

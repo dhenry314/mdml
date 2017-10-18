@@ -1,0 +1,11 @@
+{
+	"schema:name": "ingest",
+	"@type":"mdml:OAIingest",
+	"mdml:ServicePath":"http://localhost/mdml/SERVICES/mdml/OAIingestor",
+	"mdml:ServiceParams": {
+			"path": "http://lhldigital.lindahall.org/oai/oai.php",
+			"metadataPrefix": "oai_dc",
+			"sets": ["astro_atlas","astro_early","astro_images","catalog","color","cosmology","darwin","dino","earththeory","egypt","eng_tech","hedgehog","histindexes",
+"human","ice","math","nat_hist","panama","parachute","philsci","physics","railroad","rrjournal","rr_maps","sciwest","time"]				
+	}
+}

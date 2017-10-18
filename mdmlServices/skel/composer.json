@@ -1,0 +1,38 @@
+{
+    "name": "An MDML Web Service",
+    "description": "This was automatically generated.",
+    "keywords": ["webservice"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Your Name",
+            "email": "yourname@example.org"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+        "slim/slim": "^3.1",
+        "slim/php-view": "^2.0",
+        "monolog/monolog": "^1.17",
+        "tuupola/slim-jwt-auth": "^2.3",
+	"mtdowling/jmespath.php": "2.3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": ">=4.8 < 6.0"
+    },
+    "scripts": {
+   	 "test": "./vendor/bin/phpunit"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "": "lib/",
+	    "mdml\\":"mdml/"
+        }
+    }
+
+}

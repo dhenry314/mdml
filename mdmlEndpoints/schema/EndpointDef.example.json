@@ -1,0 +1,20 @@
+{
+	"@id": "http://localhost/mdml/ENDPOINTS/MOHUB/FRASER/INCOMING/",
+	"@type": ["mdml:EndpointDef"],
+	"mdml:sort":0,
+    "schema:name": "Fraser Ingest",
+	"mdml:endpointNS": "MOHUB",
+	"mdml:endpointPath":"/FRASER/INCOMING/",
+	"mdml:processes": [
+		{
+			"@id": "mohub_frbstl_fraser_ingest",
+			"@type":"mdml:OAIingestRequest",
+			"schema:name": "ingest",
+			"mdml:ServicePath":"http://localhost/mdml/SERVICES/mdml/OAIingestor",
+			"mdml:ServiceParams": {
+					"path": "https://fraser.stlouisfed.org/oai",
+					"metadataPrefix": "mods"				
+			}
+		}
+	]
+}

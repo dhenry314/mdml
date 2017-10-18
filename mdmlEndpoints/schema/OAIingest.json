@@ -1,0 +1,49 @@
+{
+  "@context": {
+    "schema": "http://schema.org/",
+    "mdml": "http://data.mohistory.org/mdml/"
+  },
+  "title": "OAIingest",
+  "type": "object",
+  "properties": {
+    "schema:name": {
+      "description": "Name of Data Source",
+      "type": "string"
+    },
+    "schema:dateCreated": {
+      "description": "Date/time when created",
+      "type": "string"
+    },
+    "mdml:ServicePath": {
+      "description": "Path to webservice",
+      "type": "string"
+    },
+    "mdml:ServiceParams": {
+                "description": "Params sent to webservice",
+        "type": "object",
+        "properties": {
+                 "path": {
+               "description": "Path to OAI feed",
+                 "type": "string"
+             },
+             "metadataPrefix": {
+               "description": "OAI metadataPrefix to use for request - normally mods or oai_dc",
+                "type": "string"
+             },
+             "sets": {
+                "description": "OAI sets to request.",
+                "type": "array"
+             }
+        },
+        "required": [
+          "path",
+          "metadataPrefix"
+        ]
+    }
+  }, "required": [
+    "schema:name",
+    "mdml:ServicePath",
+    "mdml:ServiceParams"
+  ]
+}
+

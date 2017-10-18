@@ -1,0 +1,45 @@
+{
+	"type": "object",
+	"properties": {
+		"mdml:syncs": {
+			"type": "array",
+			"minItems": 1,
+			"items": {
+				"type": "object",
+                 "oneOf":[
+                   {"$ref":"#/definitions/syncDef"}
+                 ]
+        	},
+			"uniqueItems": true
+		}
+	},
+     "required":["mdml:syncs"],
+     "definitions": {
+        "syncDef": {
+            "properties": {
+                "dc:name": {
+                    "type": "string"
+                },
+                "mdml:source": {
+                    "type":"object",
+                    "oneOf":[
+                      {"$ref":"#/definitions/endpointDef"}
+                    ]
+                },
+                "mdml:target": {
+                 	"type":"object",
+                    "oneOf":[
+                      {"$ref":"#/definitions/endpointDef"}
+                    ]
+                }
+            },
+            "required": [ "mdml:source", "mdml:target" ]
+        },
+        "endpointDef":{
+            "properties": {
+              "mdml:endpoint": {"type":"string"}
+            },
+            "required":["mdml:endpoint"]
+        }
+     }
+}
