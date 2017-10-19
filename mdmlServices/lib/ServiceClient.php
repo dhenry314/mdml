@@ -6,7 +6,7 @@ class ServiceClientException extends \Exception{};
 
 class ServiceClient {
 
-        protected $jwt;
+    protected $jwt;
 	
 	function __construct($jwt=NULL,$auth=array()) {
 		if($jwt) {
@@ -35,14 +35,17 @@ class ServiceClient {
 	*/
 	private function callInit($url) {
 		 if(!$url) {
-                        throw new ServiceClientException("No url given.");
-                }
-                $authorization = "Authorization: Bearer ".$this->jwt;
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $url);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		return $ch;
+			throw new ServiceClientException("No url given.");
+         }
+         if(!Utils::urlExists($url)) {
+			throw new ServiceClientException("URL is not found."); 
+		 }
+         $authorization = "Authorization: Bearer ".$this->jwt;
+         $ch = curl_init();
+         curl_setopt($ch, CURLOPT_URL, $url);
+         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	     return $ch;
 	}
 
 	/**
@@ -61,11 +64,17 @@ class ServiceClient {
 		if(!$result) {
 			throw new ServiceClientException("No result returned from curl call.");
 		}
-                if(curl_errno($ch)){
-                   throw new ServiceClientException("Curl error: "  . curl_error($ch));
-                }
-                curl_close($ch);
-                return json_decode($result);
+        if(curl_errno($ch)){
+            throw new ServiceClientException("Curl error: "  . curl_error($ch));
+        }
+        curl_close($ch);
+        $contents = NULL;
+        try {
+			$contents = Utils::jsonToObj($result);
+		} catch (\Exception $e) {
+			throw new ServiceClientException("Could not parse JSON from service call. " . $e->getMessage());
+		}
+		return $contents;
 	}
 
 	private function wrapParams($methodname,$args=NULL,$mirror=NULL) {
