@@ -22,3 +22,25 @@ The initial use-case we considered was to aggregate data from OAI-PMH data feeds
 
 Once records have been ingested, normalized, and mapped, they can be made available as a new (or aggregated) resourceSync endpoint.  
 Distributed Configurations
+
+## Implementing
+
+Steps to create service projects:
+
+1. Create a projects folder under the mdml home folder (mdml/projects)
+
+2. Run ./mdmlServices/scripts/createProject.php {path to folder under mdml/projects} e.g. createProject.php /usr/local/mdml/projects/MyProjectServices
+
+3. Follow the instructions in the README.md file in the created folder to complete the installation
+
+Steps to create client projects:
+
+1. Create a projects folder (if not already created)
+
+2. copy the clientSkel folder to projects and give a specific name.  e.g. cp -r clientSkel projects/MyClientProject
+
+3. Follow the instructions in the README.md file in the created folder to complete the installation
+
+Use an existing MDML project
+
+1. Clone or download the project into mdml/projects
