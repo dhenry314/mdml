@@ -16,14 +16,8 @@
 </Directory>
 ```
 
-5. Ensure that there is a symlink from 'mdml' to $MDMLCore/mdmlServices/lib/
+5. Run 'composer test' to check your installation
 
-6. Run 'composer test' to check your installation
-
-7. Get a JWT token from your login service and put the token in the url params as 'jwt'.  
-	E.G. http://example.org/myServices/TestService?jwt=e9fh5JK67df59JH...
-
-8. Calling TestService as shown above should display "Hello World!"
 
 
 

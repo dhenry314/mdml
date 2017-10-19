@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 set_time_limit(0);
 
 if(count($argv) < 2 ) {
-        die("USAGE: createProject.php {targetDir}\n");
+        die("USAGE: createProject.php {targetDir in mdml/projects/}\n");
 }
 
 $currentDir = getCWD();
