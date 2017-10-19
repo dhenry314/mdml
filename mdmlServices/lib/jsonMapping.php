@@ -11,6 +11,8 @@ class jsonMapping extends Service {
   protected $methodPrefixes = array("_path"=>"path","_var"=>"getMapVar");
   protected $serviceClient;
   protected $doc;
+  protected $sourceURI;
+  protected $originURI;
   protected $namespacesToIgnore = array('ore','http','https','map','mapVars','oai_dc');
   protected $messages = array();
   protected $mapResult;
@@ -32,6 +34,8 @@ class jsonMapping extends Service {
 							. $this->serviceArgs['mdml:sourceURI']);
 		}
 		$this->doc = $docResult->{'mdml:payload'};
+		$this->sourceURI = $this->serviceArgs['mdml:sourceURI'];
+		$this->originURI = $docResult->{'mdml:originURI'};
 	}
 	if(!$this->doc) {
 		throw new InvalidJSONMapping("Could not get input document contents from given arguments.");
@@ -293,6 +297,14 @@ class jsonMapping extends Service {
 
   public function concat($parts) {
 	return implode($parts);
+  }
+
+  public function getSourceURI() {
+	return $this->sourceURI;  
+  }
+  
+  public function getOriginURI() {
+	return $this->originURI;
   }
 
   public function arrayItemFromPattern($params) {
