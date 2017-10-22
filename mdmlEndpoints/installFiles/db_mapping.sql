@@ -1,50 +1,32 @@
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Database: `MHSmdml`
---
-
--- --------------------------------------------------------
-
 --
 -- Table structure for table `resources`
 --
 
 CREATE TABLE `resources` (
-  `ID` int(11) NOT NULL,
+  `path` varchar(767) NOT NULL,
+  `ID` int(11) UNSIGNED NOT NULL auto_increment,
   `change` varchar(20) NOT NULL,
   `lastmod` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `path` varchar(767) NOT NULL,
   `originURI` varchar(767) NOT NULL,
   `sourceURI` varchar(767) NOT NULL,
-  `hash` varchar(767) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `hash` varchar(767) NOT NULL,
+  PRIMARY KEY (`path`,`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Indexes for dumped tables
+-- Table structure for table `logging`
 --
 
---
--- Indexes for table `resources`
---
-ALTER TABLE `resources`
-  ADD PRIMARY KEY (`ID`);
+CREATE TABLE `logging` (
+  `ID` int(11) UNSIGNED NOT NULL auto_increment,
+  `logged` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `tag` varchar(767) NOT NULL,
+  `originURI` varchar(767) NOT NULL,
+  `sourceURI` varchar(767) NOT NULL,
+  `LogLevel` enum('INFO','WARNING','ERROR','') NOT NULL DEFAULT 'INFO',
+  `Message` varchar(766) NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
---
--- AUTO_INCREMENT for dumped tables
---
 
---
--- AUTO_INCREMENT for table `resources`
---
-ALTER TABLE `resources`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;COMMIT;
+
