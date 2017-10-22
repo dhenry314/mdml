@@ -19,7 +19,7 @@ class RESTService {
 
   public function __construct($path,$httpMethod='GET',$postedData=NULL,$queryStr=NULL) {
 	$config = include __DIR__ . '/../config.php';
-    	$this->config = $config;
+    $this->config = $config;
 	$this->path = trim($path);
 	//check for resourceSync specific requests
 	if($this->path == 'sitemap.xml') {
@@ -29,8 +29,8 @@ class RESTService {
 	} elseif(strstr($this->path, 'changelist.xml')) {
 		$this->method = 'getChangeList';
 	}
-        $storageClass = chr(92).$config['storageClass'];
-        $this->storage = new $storageClass();
+    $storageClass = chr(92).$config['storageClass'];
+    $this->storage = new $storageClass();
 	if($postedData) $this->postedData = $postedData;
 	if($queryStr) {
 		parse_str($queryStr,$params);
@@ -63,38 +63,38 @@ class RESTService {
 	if(ctype_digit($lastPart)) {
 		$this->recordID = $lastPart;
 	}
-    	//initialize method
-    	if(!$this->method) {
+    //initialize method
+    if(!$this->method) {
 		switch($httpMethod) {
-				case 'GET':
+			case 'GET':
+				if($this->recordID) {
+					$this->method = 'getRecord';
+				} else {
+					$this->method = 'getListing';
+				}
+			break;	
+			case 'POST':
+			case 'PUT':
+				try{
+					$this->validatePayload();
+				} catch(RESTServiceValidationException $e) {
+					throw new RESTServiceException($e->getMessage());
+				}
+				if($this->postedData) {
 					if($this->recordID) {
-						$this->method = 'getRecord';
+						$this->method = 'updateRecord';
 					} else {
-						$this->method = 'getListing';
+						$this->method = 'createRecord';
 					}
-				break;	
-				case 'POST':
-				case 'PUT':
-					try{
-						$this->validatePayload();
-					} catch(RESTServiceValidationException $e) {
-						throw new RESTServiceException($e->getMessage());
-					}
-					if($this->postedData) {
-						if($this->recordID) {
-							$this->method = 'updateRecord';
-						} else {
-							$this->method = 'createRecord';
-						}
-					}
-				break;
-				case 'DELETE':
-					if($this->recordID) {
-						$this->method = 'deleteRecord';
-					} else {
-						$this->method = 'deleteEndpoint';
-					}
-				break;
+				}
+			break;
+			case 'DELETE':
+				if($this->recordID) {
+					$this->method = 'deleteRecord';
+				} else {
+					$this->method = 'deleteEndpoint';
+				}
+			break;
 		}
 		if(!$this->method) {
 				throw new RestServiceException("Could not determine method.");
@@ -143,7 +143,7 @@ class RESTService {
 		$this->response = $doc;
 	} else {
 		$this->setError(404);
-                return FALSE;
+        return FALSE;
 	}
         return TRUE;
   }
@@ -156,9 +156,24 @@ class RESTService {
 			throw new RESTServiceException("Missing required field: " . $reqField);
 		}
 	}
-        $hash = \Utils::hashFromContents($posted['mdml:payload']);
+    $hash = \Utils::hashFromContents($posted['mdml:payload']);
 	if($loc = $this->resourceSyncService->saveResource($this->path,$posted['mdml:originURI'],$posted['mdml:sourceURI'],$hash)) {
-		$this->storage->saveDocument($posted,$loc);
+		$this->storage->insertDocument($posted,$loc);
+	}
+	$this->response = $posted;
+  }
+
+  public function updateRecord() {
+	$posted = $this->postedData;
+	$required = array("mdml:originURI","mdml:sourceURI","mdml:payload");
+	foreach($required as $reqField) {
+		if(!array_key_exists($reqField,$posted)) {
+			throw new RESTServiceException("Missing required field: " . $reqField);
+		}
+	}
+    $hash = \Utils::hashFromContents($posted['mdml:payload']);
+	if($loc = $this->resourceSyncService->saveResource($this->path,$posted['mdml:originURI'],$posted['mdml:sourceURI'],$hash)) {
+		$this->storage->updateDocument($posted,$loc);
 	}
 	$this->response = $posted;
   }
@@ -178,7 +193,7 @@ class RESTService {
 						'deleted',
 						$path)
 	) {
-		$this->storage->saveDocument($doc,$loc);
+		$this->storage->updateDocument($doc,$loc);
 	}
 	$this->setMessage("Resource " . $loc . " has been marked deleted.");
   }

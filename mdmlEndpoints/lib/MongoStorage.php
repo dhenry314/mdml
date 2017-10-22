@@ -9,6 +9,7 @@ class StorageUpdateException extends \MongoDB\Exception\RuntimeException{};
 class MongoStorage implements iStorage {
 
   var $config;
+  var $basePath;
   var $mongoDB;
   var $mongoColl;
   var $maxResults = 20;
@@ -17,12 +18,19 @@ class MongoStorage implements iStorage {
   public function __construct() {
     $config = include __DIR__ . '/../config.php';
     $this->config = $config;
-    $connecting_string =  sprintf('mongodb://%s:%d/',
-                             $config['mongo']['host'],
-                             $config['mongo']['port']
-    );
+    $this->basePath = $this->config['HTTP_PROTOCOL']."//". $_SERVER['SERVER_NAME'] . $this->config['BASE_PATH'];
+    if(!array_key_exists('mongo',$this->config)) {
+		throw new StorageConnectionException("No mongo connection in configuration!");
+	}
+    if(array_key_exists('connect_string',$this->config['mongo'])) {
+			$connecting_string = $this->config['mongo']['connect_string'];
+	} else {
+			$connecting_string =  sprintf('mongodb://%s:%d/',
+                             $this->config['mongo']['host'],
+                             $this->config['mongo']['port']);
+    }
     if(array_key_exists('connectOptions',$config['mongo'])) {
-	$options = $config['mongo']['connectOptions'];
+		$options = $config['mongo']['connectOptions'];
     } else {
     	$options = array();
     }
@@ -41,11 +49,16 @@ class MongoStorage implements iStorage {
       throw new StorageConnectionException($e->getMessage());
     }
   }
+  
+  public function saveDocument($doc,$loc){
+	return $this->upsert($doc,$loc);
+  }
 
   public function getDocument($loc) {
+	  $id = $this->basePath.$loc;
       //handle entities
       if(strstr($id,'&amp;')) {
-	$id = str_replace('&amp;','&',$id);
+			$id = str_replace('&amp;','&',$id);
       }
       $query = array('@id'=>$id);
       try {
@@ -54,24 +67,22 @@ class MongoStorage implements iStorage {
         throw new StorageQueryException($e->getMessage(),$e->getCode());
       }
       if(!$doc) {
-	return FALSE;
+			return FALSE;
       }
       $json = json_encode( $doc->getArrayCopy() );
       return $json;
   }
 
   public function removeDocument($loc) {
-    $fullID = $this->config['BASE_URI'].$type."/".$id;
+	$id = $this->basePath.$loc;
     $query = array('@id'=>$fullID);
     return $this->deleteByQuery($query);
   }
   
   public function upsert($doc,$loc) {
-        if(array_key_exists("@id",$filter)) {
-               $id = $filter["@id"];
-        } else {
-		throw new Exception("No id defined for upsert.");
-	}
+	$id = $this->basePath.$loc;
+	$doc['@id'] = $id;
+	$filter = array('@id'=>$id);
 	if($existing = $this->findOne($filter)) {
 		return $this->updateDocument($doc,$id);
 	} else {
@@ -91,10 +102,13 @@ class MongoStorage implements iStorage {
   }
   
   public function insertDocument($doc,$loc) {
-    if(is_array($doc)) {
-	$doc = \Utils::arrayToObj($doc);
+	$id = $this->basePath.$loc;
+    if(!array_key_exists('@id',$doc)) {
+		$doc['@id'] = $id;
+	}
+	if(is_array($doc)) {
+		$doc = \Utils::arrayToObj($doc);
     }
-    $doc->{'@id'} = $id;
     try {
       $result = $this->mongoColl->insertOne($doc);
     } catch (\Exception $e) {
@@ -104,6 +118,7 @@ class MongoStorage implements iStorage {
   }
 
   public function updateDocument($doc,$loc) {
+	$id = $this->basePath.$loc;
     $idQuery = array('@id'=>$id);
     try {
       $result = $this->mongoColl->replaceOne($idQuery,$doc);

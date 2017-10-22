@@ -100,11 +100,17 @@ class DbFsStorage implements iStorage {
 	return $path; 
   }
 
-  public function upsert($doc,$loc){}
+  public function upsert($doc,$loc){
+	$this->saveDocument($doc,$loc);  
+  }
 
-  public function insertDocument($doc,$loc){}
+  public function insertDocument($doc,$loc){
+	$this->saveDocument($doc,$loc);  
+  }
 
-  public function updateDocument($doc,$loc){}
+  public function updateDocument($doc,$loc){
+	$this->saveDocument($doc,$loc);  
+  }
 
   public function getCount(){}
 
