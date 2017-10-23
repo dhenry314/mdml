@@ -53,8 +53,6 @@ if(!xcopy($skelDir,$targetDir)) {
 	die("Could not copy skel to target directory: " . $targetDir);
 }
 
-//add a symlink from targetDir/mdml to libDir
-symlink($libDir, $targetDir."/mdml");
 echo "Done.";	
 
 ?>
