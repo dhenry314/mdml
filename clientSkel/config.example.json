@@ -4,5 +4,5 @@
 "endpointsBase": "http://example.org/myEndpoints/",
 "servicesPath": "http://example.org/myServices/description.json",
 "processDir": "/usr/local/mdmlClient/process/",
-"logDir": "/usr/local/mdmlClient/logs/"
+"loggingService": "http://example.org/myEndpoints/loggingService"
 }
