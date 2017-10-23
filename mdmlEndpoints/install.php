@@ -42,10 +42,14 @@ if($config['storageClass'] == 'DbFsStorage') {
 		die("No configuration for MongoDB found. \n
 		Please create a mongo confuration as found in config.example.php\n\n");
 	}
-	$connecting_string =  sprintf('mongodb://%s:%d/',
+	if(array_key_exists('connect_string',$config['mongo'])) {
+		$connecting_string = $config['mongo']['connect_string'];
+	} else {
+		$connecting_string =  sprintf('mongodb://%s:%d/',
                               $config['mongo']['host'],
                               $config['mongo']['port']
                         );
+	}
 	$options = array();
 	if(array_key_exists('adminPW', $config['mongo']) && array_key_exists('adminUser', $config['mongo'])) {
       		$options['username'] = $config['mongo']['adminUser'];

@@ -4,45 +4,40 @@ return array(
 	'JWT_SECRET' => 'some_secret',
 	'JWT_TTL_SECS' => 360000,
 	'JWT_ISSUER' => 'http://example.org/',
-	'BASE_PATH' => '/mdmlEndpoints/',
+	'BASE_PATH' => '/my-endpoints/',
 	'HTTP_PROTOCOL' => 'http',
 	'MAX_RESULTS' => 1000,
-	'storageClass' => 'DbFsStorage',
+	'storageClass' => 'MongoStorage',
 	'mongo' => array(
-                'host' => 'some_ip',
-                'port' => 'some_port',
-                'user' => 'some_mongo_user',
-                'pw' => 'some_mongo_password',
-                'adminUser' => 'some_admin_user',
-                'adminPW' => 'some_admin_password',
-                'database' => 'mdml-endpoints',
+		'connect_string' => 'mongodb://Auser:aPasswd@a0.example.org:27018,a1.example.org:27018',
+                'host' => 'a0.example.org',
+                'port' => '27018',
+                'user' => 'Auser',
+                'pw' => 'aPasswd',
+                'adminUser' => 'Auser',
+                'adminPW' => 'aPasswd',
+                'database' => 'my-endpoints',
                 'connectOptions'=> array("connectTimeoutMS"=>300000,"serverSelectionTryOnce"=>false),
-                'collections' => array('mdml','logging','counters'),
+                'collections' => array('mdml'),
                 'indices' => array(
-                        'logging' => array(
-                                'mdml:processID' => 1,
-                                'mdml:endpoint' => 1,
-                                'mdml:originURL' => 1,
-                                'mdml:logLevel' => 1
-                        ),
                         'mdml' => array(
                                 'mdml_endpoint' => 1,
                                 'rs_md_hash' => 1,
                                 'sm_loc' => 1
                         )
                 )
-        ),
+    	),
         'db' => array(
-		'connectStr' => 'mysql:host=localhost;dbname=MHSmdml',
-		'user' => 'some_db_user',
-		'pw' => 'some_db_password'
+		'connectStr' => 'mysql:host=localhost;dbname=MYmdml',
+		'user' => 'some_user',
+		'pw' => 'some_pw'
 	),
         'namespaces' => array(
-                'mdml' => 'http://example.org/mdml/',
+                'mdml' => 'http://data.mohistory.org/mdml/',
                 'sitemap' => 'http://www.sitemaps.org/schemas/sitemap/0.9',
                 'rs' => 'http://www.openarchives.org/rs/terms/'
         ),
-	'loginService' => 'http://example.org/mdmlV2/login/',
-	'cacheDir' => '/usr/local/mdmlCoreV2/cache/'
+	'loginService' => 'http://example.org/my-endpoints/login',
+	'cacheDir' => '/path/to/mdml/mdmlEndpoints/cache/'
 );
 ?>
