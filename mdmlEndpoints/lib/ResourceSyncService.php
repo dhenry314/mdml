@@ -30,6 +30,8 @@ class ResourceSyncService {
          $url['loc'] = $this->fullPath($row['path']).$row['ID'];
 	 $url['hash'] = "md5:".$row['hash'];
 	 $url['lastMod'] = date('c',strtotime($row['lastmod']));
+	 $url['mdml:sourceURI'] = $row['sourceURI'];
+	 $url['mdml:originURI'] = $row['originURI'];
 	 return $url;
   }
 
