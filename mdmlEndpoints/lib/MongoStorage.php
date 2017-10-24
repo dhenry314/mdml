@@ -18,7 +18,7 @@ class MongoStorage implements iStorage {
   public function __construct() {
     $config = include __DIR__ . '/../config.php';
     $this->config = $config;
-    $this->basePath = $this->config['HTTP_PROTOCOL']."//". $_SERVER['SERVER_NAME'] . $this->config['BASE_PATH'];
+    $this->basePath = $this->config['HTTP_PROTOCOL']."://". $_SERVER['SERVER_NAME'] . $this->config['BASE_PATH'];
     if(!array_key_exists('mongo',$this->config)) {
 		throw new StorageConnectionException("No mongo connection in configuration!");
 	}
@@ -97,8 +97,8 @@ class MongoStorage implements iStorage {
         throw new StorageQueryException($e->getMessage(),$e->getCode());
       }
       if(!is_object($doc)) return FALSE;
-      $json = json_encode( $doc->getArrayCopy() );
-      return $json;
+      $json = \MongoDB\BSON\toJSON(\MongoDB\BSON\fromPHP($doc));
+      return Utils::jsonToObj($json);
   }
   
   public function insertDocument($doc,$loc) {
