@@ -83,7 +83,7 @@ class ResourceSyncService {
         return $info;
   }
 
-  public function getPathResources($path,$filter=array()) {
+  public function getPathResources($path,$paging,$filter=array()) {
 	$path = $this->getBasePath($path);
 	//get a listing of locs
         $params = array(':path'=>$path);
@@ -100,6 +100,7 @@ class ResourceSyncService {
 		}
 	}
 	$sql .= " AND NOT `change` = 'deleted'";
+	$sql .= " LIMIT " . $paging['offset'].",".$paging['count'];
         $sth = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $sth->execute($params);
         $urls = array();
@@ -110,10 +111,10 @@ class ResourceSyncService {
 	return $urls;
   }
 
-  public function getResourcelist($path,$format='xml',$filter=array()) {
+  public function getResourcelist($path,$format='xml',$paging,$filter=array()) {
 	$path = $this->getBasePath($path);
   	//get a listing of urls
-	$urls = $this->getPathResources($path,$filter);
+	$urls = $this->getPathResources($path,$paging,$filter);
 	if($format == 'json') {
 		\Utils::returnJSON($urls);
 	}

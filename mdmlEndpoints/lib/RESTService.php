@@ -199,7 +199,7 @@ class RESTService {
   }
 
   public function getListing($params=array()) {
-  	return $this->resourceSyncService->getResourcelist($this->path,'json',$this->filter);
+  	return $this->resourceSyncService->getResourcelist($this->path,'json',$this->paging,$this->filter);
   }
 
   public function post() {
