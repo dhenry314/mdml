@@ -55,7 +55,7 @@ class MongoStorage implements iStorage {
   }
 
   public function getDocument($loc) {
-	  $id = $this->basePath.$loc;
+      $id = $this->basePath.$loc;
       //handle entities
       if(strstr($id,'&amp;')) {
 			$id = str_replace('&amp;','&',$id);
@@ -67,10 +67,10 @@ class MongoStorage implements iStorage {
         throw new StorageQueryException($e->getMessage(),$e->getCode());
       }
       if(!$doc) {
-			return FALSE;
+	return FALSE;
       }
-      $json = json_encode( $doc->getArrayCopy() );
-      return $json;
+      $json = \MongoDB\BSON\toJSON(\MongoDB\BSON\fromPHP($doc));
+      return Utils::jsonToObj($json);
   }
 
   public function removeDocument($loc) {
