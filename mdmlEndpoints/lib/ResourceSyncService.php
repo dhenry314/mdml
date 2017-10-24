@@ -77,9 +77,12 @@ class ResourceSyncService {
         $sql = "SELECT `change` FROM `resources` WHERE `path` = :path";
         $sth = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $sth->execute($params);
+	$total = 0;
         while($row = $sth->fetch( PDO::FETCH_ASSOC )){
 		$info[$row['change']]++;
+		if($row['change'] != 'deleted') $total++;
         }
+	$info['total'] = $total;
         return $info;
   }
 
