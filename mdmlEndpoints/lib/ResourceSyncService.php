@@ -201,15 +201,15 @@ class ResourceSyncService {
 	if(substr($path,-1,1)=="/") {
 		$path = substr($path,0,strlen($path)-1);
 	}
+	$pathParts = explode("/",$path);
+	$lastPart = array_pop($pathParts);
+	if(ctype_digit($lastPart)) {
+	       $path = implode("/",$pathParts);
+	}
 	return $path;
   }
 
   public function existingResource($path,$sourceURI) {
-	$pathParts = explode("/",$path);
-	$lastPart = array_pop($pathParts);
-	if(ctype_digit($lastPart)) {
-		$path = implode("/",$pathParts);
-	}
 	$params = array(':path'=>$path,':sourceURI'=>$sourceURI);
 	$sql = "SELECT * FROM `resources` WHERE `path` = :path AND `sourceURI` = :sourceURI";
         $sth = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
@@ -235,56 +235,40 @@ class ResourceSyncService {
 
   public function saveResource($path,$originURI,$sourceURI,$hash=NULL,$change='created',$loc=NULL) {
 	$path = $this->normalizePath($path);
+	$loc = NULL;
+	$params = array(
+		':path'=>$path,
+		':change'=>$change,
+		':sourceURI'=>$sourceURI,
+		':hash'=>$hash
+	);
 	if($resource = $this->existingResource($path,$sourceURI)) {
-		$id = $resource['ID'];
-		$loc = $path."/".$id;
-	} else {
-		$pathParts = explode("/",$path);
-		$lastPart = array_pop($pathParts);
-		if(ctype_digit($lastPart)) {
-			$id = $lastPart;
-			$path = implode("/",$pathParts);
-		}
-	} 
-	$params = array(':path'=>$path,':change'=>$change,':originURI'=>$originURI,':sourceURI'=>$sourceURI,':hash'=>$hash);
-	if(!$id) {
-		if($loc) {
-			$id = trim(str_replace($path,'',$loc));
-			$params[':ID'] = $id;
-		}
-	}
-	if($id) {
 		if($change != 'deleted') {
 			$change = 'updated';
 			$params[':change'] = $change;
 		}
-		$params[':ID'] = $id;
+		$loc = $path."/".$resource['ID'];
 	}
 	if($change != 'created') {
 		$params[':lastMod'] = date("Y-m-d H:i:s");
 	}
 	switch($change) {
 		case 'created':
+			$params[':originURI'] = $originURI;
 			$sql = 'INSERT INTO `resources` (`change`,`path`,`originURI`,`sourceURI`,`hash`) VALUES ';
 			$sql .= '(:change,:path,:originURI,:sourceURI,:hash)';
 		break;
 		case 'updated':
-			if(!$id) {
-				throw new ResourceSyncException("ID is required for update!");
-			}
 			if($resource['hash'] == $hash) {
 				return FALSE;
 			}
-			$sql = 'UPDATE `resources` SET `change` = :change, `path` = :path, `originURI` = :originURI, ';
-			$sql .= ' `sourceURI` = :sourceURI, `hash` = :hash, `lastMod` = :lastMod WHERE ID = :ID ';
+			$sql = 'UPDATE `resources` SET `change` = :change, `hash` = :hash, ';
+			$sql .= '`lastMod` = :lastMod WHERE `path` = :path AND `sourceURI` = :sourceURI ';
 		break;
 		case 'deleted':
-			 if(!$id) {
-                                throw new ResourceSyncException("ID is required for delete!");
-                        }
 			unset($params[':hash']);
-			$sql = 'UPDATE `resources` SET `change` = :change, `path` = :path, `originURI` = :originURI, ';
-                        $sql .= ' `sourceURI` = :sourceURI, `lastMod` = :lastMod WHERE ID = :ID ';
+			$sql = 'UPDATE `resources` SET `change` = :change, `hash` = NULL, ';
+			$sql .= '`lastMod` = :lastMod WHERE `path` = :path AND `sourceURI` = :sourceURI ';
 		break;
 		default:
 			throw new ResourceSyncException("Unknown change value: " . $change);
@@ -297,9 +281,7 @@ class ResourceSyncService {
         	throw new ResourceSyncException($e->getMessage());
     	}
 	if(!$loc) {
-		if(!$id) {
-			$id = $this->db->lastInsertId();
-		}
+		$id = $this->db->lastInsertId();
 		if(substr($path,-1,1) != "/") {
 			$path .= "/";
 		}
