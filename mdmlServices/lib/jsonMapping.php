@@ -33,9 +33,15 @@ class jsonMapping extends Service {
 			throw new InvalidJSONMapping("Could not load input document from given sourceURI: " 
 							. $this->serviceArgs['mdml:sourceURI']);
 		}
-		$this->doc = $docResult->{'mdml:payload'};
-		$this->sourceURI = $this->serviceArgs['mdml:sourceURI'];
-		$this->originURI = $docResult->{'mdml:originURI'};
+		if(is_object($docResult)) {
+			$this->doc = $docResult->{'mdml:payload'};
+			$this->sourceURI = $this->serviceArgs['mdml:sourceURI'];
+			$this->originURI = $docResult->{'mdml:originURI'};
+		} elseif(is_array($docResult)) {
+			$this->doc = $docResult['mdml:payload'];
+			$this->sourceURI = $this->serviceArgs['mdml:sourceURI'];
+			$this->originURI = $docResult['mdml:originURI'];
+		}
 	}
 	if(!$this->doc) {
 		throw new InvalidJSONMapping("Could not get input document contents from given arguments.");
@@ -70,6 +76,9 @@ class jsonMapping extends Service {
   }
 
   private function toObj($json) {
+  	if(is_array($json)) {
+		return (object)$json;
+	}
         $json = trim($json);
         if(!$obj = json_decode($json)) {
               throw new \Exception('ERROR: cannot parse json. ' . json_last_error_msg() . " json = " . $json);
