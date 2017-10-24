@@ -410,6 +410,13 @@ class Utils {
         $result = json_decode($result_json);
         return $result;
   }
+
+  static function tagToArray($tag) {
+        $x = new \SimpleXMLElement($tag);
+        $tagData =  (array)$x;
+        return $tagData;
+  }
+
   
   
 
