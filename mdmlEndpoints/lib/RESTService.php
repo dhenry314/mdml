@@ -19,7 +19,7 @@ class RESTService {
 
   public function __construct($path,$httpMethod='GET',$postedData=NULL,$queryStr=NULL) {
 	$config = include __DIR__ . '/../config.php';
-    $this->config = $config;
+	$this->config = $config;
 	$this->path = trim($path);
 	//check for resourceSync specific requests
 	if($this->path == 'sitemap.xml') {

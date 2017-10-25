@@ -58,7 +58,7 @@ class MongoStorage implements iStorage {
       $id = $this->basePath.$loc;
       //handle entities
       if(strstr($id,'&amp;')) {
-			$id = str_replace('&amp;','&',$id);
+	$id = str_replace('&amp;','&',$id);
       }
       $query = array('@id'=>$id);
       try {
@@ -118,14 +118,17 @@ class MongoStorage implements iStorage {
   }
 
   public function updateDocument($doc,$loc) {
-	$id = $this->basePath.$loc;
-    $idQuery = array('@id'=>$id);
-    try {
-      $result = $this->mongoColl->replaceOne($idQuery,$doc);
-    } catch (\Exception $e) {
-      throw new StorageUpdateException($e->getMessage(),$e->getCode());
-    }
-    return $result;
+    	$id = $this->basePath.$loc;
+        if(!array_key_exists('@id',$doc)) {
+              $doc['@id'] = $id;
+        }
+	$idQuery = array('@id'=>$id);
+    	try {
+      		$result = $this->mongoColl->replaceOne($idQuery,$doc);
+    	} catch (\Exception $e) {
+      		throw new StorageUpdateException($e->getMessage(),$e->getCode());
+    	}
+    	return $result;
   }
 
   public function getCursor($query,$options) {
