@@ -102,3 +102,15 @@ class Utils:
 			return self.datetime.datetime.utcnow().isoformat()
 		return date.isoformat()
 
+	def createEndpointRequest(self,sourceURI,originURI,payload,schema=None):
+		request = {}
+		request["@context"] = {}
+		request["@context"]["mdml"] = "http://data.mohistory.org/mdml#"
+		request["mdml:sourceURI"] = sourceURI
+		request["mdml:originURI"] = originURI
+		request["mdml:payload"] = payload
+		if schema is None:
+			return request
+		request["mdml:payloadSchema"] = schema
+		return request
+

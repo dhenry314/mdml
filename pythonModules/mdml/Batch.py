@@ -26,6 +26,25 @@ class Batch:
 		except AttributeError as e:
 			raise ValueError("No service found")
 		return parts
+
+	def getEndpointBase(self,url):
+		endpointBase = url
+		parts = url.split(".")
+		ext = parts.pop()
+		if ext == 'xml' or ext == 'json':
+			sParts = url.split("/")
+			filename = sParts.pop()
+			endpointBase = '/'.join([str(i) for i in sParts])
+		return endpointBase
+	
+	def getEndpointTotal(self,endpoint):
+		url = str(endpoint) + "/info.json" 
+		infoJ = self.u.getMDMLResponse(url,self.jwt)
+		return infoJ['total']
+
+	def getEndpointBatch(self,endpoint,offset,count):
+		url = str(endpoint) + "?offset=" + str(offset) + "&count=" + str(count)
+		return self.u.getMDMLResponse(url,self.jwt)
 		
 	def callService(self,serviceURI,service):
 		loggingTag = str(service['methodname']) + "_" + self.u.getISODate()
@@ -67,11 +86,32 @@ class Batch:
 		else: 
 			raise ValueError("S2E service definition does NOT include mdml:targetEndpoint")
 		return self.callService(parts["serviceURI"],parts["service"])
-		
+
+	def E2EItem(self,sourceURI,originURI,serviceURI,service,targetEndpoint):
+		service["args"]["mdml:sourceURI"] = sourceURI
+		result = self.callService(serviceURI,service)
+		request = self.u.createEndpointRequest(sourceURI,originURI,result['result'])
+		return self.u.postMDMLService(targetEndpoint,self.jwt,request)
+
 	def runE2E(self,process):
 		parts = self.validateProcess(process)
-		print "In E2E"
-		print parts
+		sourceEndpoint = self.getEndpointBase(process.sourceEndpoint)
+		sourceTotal = self.getEndpointTotal(sourceEndpoint)
+		targetEndpoint = self.getEndpointBase(process.targetEndpoint)
+		offset=0
+		while offset < sourceTotal:
+			records = self.getEndpointBatch(sourceEndpoint,offset,10)
+			for record in records:
+				result = self.E2EItem(record['loc'],record['mdml:originURI'],process.serviceURI,parts["service"],targetEndpoint)
+				if "exception" in result:
+					print "sourceURI: " + str(record['loc'])
+					print " EXCEPTION: " + str(result['exception']) 
+					print " ERROR: " + str(result['message'])
+				else:
+					print "sourceURI: " + str(record['loc']) + " successfully processed."
+
+			offset = offset+10
+		print "all records mapped"
 		exit()
 		
 	def runE2S(self,process):
