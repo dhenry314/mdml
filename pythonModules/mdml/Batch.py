@@ -43,7 +43,12 @@ class Batch:
 		return infoJ['total']
 
 	def getEndpointBatch(self,endpoint,offset,count):
-		url = str(endpoint) + "?offset=" + str(offset) + "&count=" + str(count)
+		if self.option == 'all':
+			url = str(endpoint) + "?"
+		else:
+			url = str(endpoint) + "/changelist.xml?format=json&"
+			
+		url = url + "offset=" + str(offset) + "&count=" + str(count)
 		return self.u.getMDMLResponse(url,self.jwt)
 		
 	def callService(self,serviceURI,service):
@@ -52,10 +57,11 @@ class Batch:
 		service['args']['mdml:loggingTag'] = loggingTag
 		return self.u.postMDMLService(serviceURI,self.jwt,service)
 		
-	def run(self,processName):
+	def run(self,processName,option=None):
 		processPath = self.processDir + str(processName) + ".json"
 		if not self.os.path.isfile(processPath):
 			raise ValueError("ERROR: No process file found at " + processPath)
+		self.option = option
 		with open(processPath) as json_data_file:
 			try:
 				processJ = self.json.load(json_data_file)

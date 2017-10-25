@@ -28,12 +28,16 @@ try:
 except IndexError as e:
 	print "No process name given. "
 	sys.exit()
-	
+
+option = None
+if len(sys.argv) > 2:
+	option = str(sys.argv[2]).lower()
+
 jwt = loadToken()
 
 try:
 	Batch.load(jwt,config)
-	result = Batch.run(processName)
+	result = Batch.run(processName,option)
 except ValueError as e:
 	print "Could not run batch. ERROR: " + str(e)
 	exit()
