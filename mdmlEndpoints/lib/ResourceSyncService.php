@@ -90,6 +90,13 @@ class ResourceSyncService {
 
   public function getPathResources($path,$paging,$filter=array()) {
 	$path = $this->getBasePath($path);
+	//set paging defaults
+	if(!array_key_exists('offset',$paging)) {
+		$paging['offset'] = 0;
+	}
+	if(!array_key_exists('count',$paging)) {
+		$paging['count'] = 20;
+	}
 	//get a listing of locs
         $params = array(':path'=>$path);
         $sql = "SELECT * FROM `resources` WHERE `path` = :path ";
@@ -102,6 +109,8 @@ class ResourceSyncService {
 				$fValue = str_replace('\\','%',$fValue);
 			}
 			$sql .= " AND `".$fField."` LIKE '".$fValue."' ";
+		} elseif(array_key_exists('where_clause',$filter)) {
+			$sql .= " AND ".$filter['where_clause'];
 		}
 	}
 	$sql .= " AND NOT `change` = 'deleted'";
@@ -146,23 +155,21 @@ class ResourceSyncService {
 		$untilTS = strtotime($queryParams['until']);
 	}
 	$until = date('Y-m-d H:i:s', $untilTS);
-	$params=array();
-	$params[':path'] = $path;
-	$params[':from'] = $from;
-	$params[':until'] = $until;
-	$sql = "SELECT * FROM `resources` WHERE `lastmod` >= :from AND `lastmod` <= :until AND path = :path";
-	$sql .= " AND NOT `change` = 'deleted'";
-	$sth = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-        $sth->execute($params);
-        $urls = array();
-        while($row = $sth->fetch( PDO::FETCH_ASSOC )){
-             $url = $this->getURL($row);
-             $urls[] = $url;
-        }
+	$filter=array();
+	$filter['where_clause'] = "`lastmod` >= '".$from."' AND `lastmod` <= '".$until."'";
+	$paging = array();
+	if(array_key_exists('offset',$queryParams)) {
+	        $paging['offset'] = $queryParams['offset'];
+	}
+	if(array_key_exists('count',$queryParams)) {
+	        $paging['count'] = $queryParams['count'];
+	}
+
+	$urls = $this->getPathResources($path,$paging,$filter);
 	if($format == 'json') {
-                \Utils::returnJSON($urls);
-        }
-        return $this->createURLSet($urls);
+	       \Utils::returnJSON($urls);
+	}
+	return $this->createURLSet($urls);
   }
 
   private function createURLSet($urls) {
