@@ -295,7 +295,6 @@ class ResourceSyncService {
 		$loc = $path.$id;
 	}
 	return $loc;
-
   }
 
 }

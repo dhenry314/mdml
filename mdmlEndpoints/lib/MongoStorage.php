@@ -102,8 +102,12 @@ class MongoStorage implements iStorage {
   }
   
   public function insertDocument($doc,$loc) {
-	$id = $this->basePath.$loc;
-    if(!array_key_exists('@id',$doc)) {
+  	if(!strstr($loc,$this->basePath)) {
+                 $id = $this->basePath.$loc;
+        } else {
+                 $id = $loc;
+        }
+        if(!array_key_exists('@id',$doc)) {
 		$doc['@id'] = $id;
 	}
 	if(is_array($doc)) {
@@ -118,7 +122,11 @@ class MongoStorage implements iStorage {
   }
 
   public function updateDocument($doc,$loc) {
-    	$id = $this->basePath.$loc;
+  	if(!strstr($loc,$this->basePath)) {
+    		$id = $this->basePath.$loc;
+	} else {
+		$id = $loc;
+	}
         if(!array_key_exists('@id',$doc)) {
               $doc['@id'] = $id;
         }

@@ -156,9 +156,9 @@ class RESTService {
 			throw new RESTServiceException("Missing required field: " . $reqField);
 		}
 	}
-    $hash = \Utils::hashFromContents($posted['mdml:payload']);
+    	$hash = \Utils::hashFromContents($posted['mdml:payload']);
 	if($loc = $this->resourceSyncService->saveResource($this->path,$posted['mdml:originURI'],$posted['mdml:sourceURI'],$hash)) {
-		$this->storage->insertDocument($posted,$loc);
+		$this->storage->upsert($posted,$loc);
 	}
 	$this->response = $posted;
   }
