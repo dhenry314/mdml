@@ -93,9 +93,11 @@ class EndpointClient extends Service {
 	*
 	* @return string a JSON result
 	*/
-	private function getData($url,$params=array()) {
-		$query_str = http_build_query($params);
-		$url .= "?".$query_str;
+	protected function getData($url,$params=array()) {
+		if(count($params)>0) {
+			$query_str = http_build_query($params);
+			$url .= "?".$query_str;
+		}
 		$ch = $this->callInit($url);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
 		return $this->call($ch);
@@ -176,11 +178,19 @@ class EndpointClient extends Service {
         *
         * @return string a JSON result
         */
-	public function resourceList($endpoint,$format=json) {
+	public function resourceList($endpoint,$paging=array("offset"=>0,"count"=>20),$format='json') {
 		$url = $this->addFileName($endpoint,"resourcelist.xml");
                 //set params
                 $params = array();
                 $params['format'] = $format;
+		if(count($paging)>0) {
+			if(array_key_exists('offset',$paging)) {
+				$params['offset'] = $paging['offset'];
+			}
+			if(array_key_exists('count',$paging)) {
+				$params['count'] = $paging['count'];
+			}
+		}
                 return $this->getData($url,$params);
 	}
 
@@ -196,7 +206,7 @@ class EndpointClient extends Service {
         */
 	public function info($endpoint) {
 		$url = $this->addFileName($endpoint,"info.json");
-                return $this->getData($url,$params);
+                return $this->getData($url);
 	}
 
 }

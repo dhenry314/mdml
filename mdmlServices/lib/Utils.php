@@ -207,6 +207,40 @@ class Utils {
     return !(!$file_headers || $file_headers[0] === 'HTTP/1.1 404 Not Found');
   }
 
+  public static function protectedURLExists($url,$jwt=NULL) {
+	// create curl resource
+	$ch = curl_init();
+
+	// set url
+	curl_setopt($ch, CURLOPT_URL, $url);
+	if($jwt) {
+		$authorization = "Authorization: Bearer ".$jwt;
+        	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+	}
+	//return the transfer as a string
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_VERBOSE, 1);
+	curl_setopt($ch, CURLOPT_HEADER, 1);
+	$response = curl_exec($ch);
+	
+	$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+	$output = substr($response, 0, $header_size);
+
+	// close curl resource to free up system resources
+	curl_close($ch);
+
+	$headers=array();
+
+	$data=explode("\n",$output);
+	$status = $data[0];
+	$sParts = explode(" ",$status);
+	$statusCode = $sParts[1];
+	if(in_array($statusCode,array(200,301,301))) {
+		return true;
+	}
+	return false;
+  }
+
   public static function ObjFromJSONurl($url) {
 	if(!$contents = Utils::getFileContents($url)) {
 		throw new \Exception("Could not load contents from " . $url);
