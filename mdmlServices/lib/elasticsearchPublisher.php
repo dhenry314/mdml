@@ -26,6 +26,8 @@ class elasticsearchPublisher extends Service {
 
 	public $sourceURI;
 
+	public $originURI;
+
 	public $serviceClient;
 
 	public $sourceDoc;
@@ -49,8 +51,10 @@ class elasticsearchPublisher extends Service {
                 }
                 if(is_object($docResult)) {
                         $this->sourceDoc = $docResult->{'mdml:payload'};
+			$this->originURI = $docResult->{'mdml:originURI'};
                 } elseif(is_array($docResult)) {
                         $this->sourceDoc = $docResult['mdml:payload'];
+			$this->originURI = $docResult['mdml:originURI'];
                 }
 		$this->esColl = ClientBuilder::create()->setHosts($cfg['elasticSearch']['hosts'])->build();
 		$this->esIndex = $cfg['elasticSearch']['index'];
@@ -73,6 +77,7 @@ class elasticsearchPublisher extends Service {
 	}
 
 	protected function index() {
+		$this->sourceDoc['mdml_originURI'] = $this->originURI;
 		$params = array(
 			'index' => $this->esIndex,
 			'type' => $this->esType,
