@@ -132,13 +132,15 @@ class Batch:
 		while offset < sourceTotal:
 			records = self.getEndpointBatch(sourceEndpoint,offset,10)
 			for record in records:
+				print "sourceURI: " + str(record['loc'])
 				result = self.E2SItem(record['loc'],process.serviceURI,parts["service"])
 				if "exception" in result:
-					print "sourceURI: " + str(record['loc'])
 					print " EXCEPTION: " + str(result['exception']) 
 					print " ERROR: " + str(result['message'])
+				elif "fault" in result:
+					print " FAULT: " + str(result['fault']['string'])
 				else:
-					print "sourceURI: " + str(record['loc']) + " successfully processed."
+					print " successfully processed. "
 
 			offset = offset+10
 		print "all records run through service"
