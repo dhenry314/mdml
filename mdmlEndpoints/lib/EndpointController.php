@@ -97,7 +97,7 @@ class EndpointController {
         if($this->requestedPath == 'sitemap.xml') {
                 return $this->ResourceSyncService->getSitemap($format);
         } elseif(strstr($this->requestedPath,'resourcelist.xml')) {
-                return $this->ResourceSyncService->getResourceList($this->requestedPath,$format);
+                return $this->ResourceSyncService->getResourceList($this->requestedPath,$format,$queryParams);
         } elseif(strstr($this->requestedPath, 'changelist.xml')) {
 		parse_str($this->queryStr, $queryParams);
         	return $this->ResourceSyncService->getChangelist($this->requestedPath,$queryParams);

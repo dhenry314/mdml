@@ -125,8 +125,16 @@ class ResourceSyncService {
 	return $urls;
   }
 
-  public function getResourcelist($path,$format='xml',$paging,$filter=array()) {
+  public function getResourcelist($path,$format='xml',$queryParams=array(),$filter=array()) {
 	$path = $this->getBasePath($path);
+	$paging = array();
+	if(array_key_exists('offset',$queryParams)) {
+	       $paging['offset'] = $queryParams['offset'];
+	}
+	if(array_key_exists('count',$queryParams)) {
+	       $paging['count'] = $queryParams['count'];
+	}
+
   	//get a listing of urls
 	$urls = $this->getPathResources($path,$paging,$filter);
 	if($format == 'json') {
