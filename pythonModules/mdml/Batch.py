@@ -99,6 +99,10 @@ class Batch:
 		request = self.u.createEndpointRequest(sourceURI,originURI,result['result'])
 		return self.u.postMDMLService(targetEndpoint,self.jwt,request)
 
+	def E2SItem(self,sourceURI,serviceURI,service):
+		service["args"]["mdml:sourceURI"] = sourceURI
+		return self.callService(serviceURI,service)
+
 	def runE2E(self,process):
 		parts = self.validateProcess(process)
 		sourceEndpoint = self.getEndpointBase(process.sourceEndpoint)
@@ -121,7 +125,24 @@ class Batch:
 		exit()
 		
 	def runE2S(self,process):
-		print "In E2S"
+		parts = self.validateProcess(process)
+		sourceEndpoint = self.getEndpointBase(process.sourceEndpoint)
+		sourceTotal = self.getEndpointTotal(sourceEndpoint)
+		offset=0
+		while offset < sourceTotal:
+			records = self.getEndpointBatch(sourceEndpoint,offset,10)
+			for record in records:
+				result = self.E2SItem(record['loc'],process.serviceURI,parts["service"])
+				if "exception" in result:
+					print "sourceURI: " + str(record['loc'])
+					print " EXCEPTION: " + str(result['exception']) 
+					print " ERROR: " + str(result['message'])
+				else:
+					print "sourceURI: " + str(record['loc']) + " successfully processed."
+
+			offset = offset+10
+		print "all records run through service"
+		exit()
 		
 	def runPipeline(self,process):
 		for service in process.services:
