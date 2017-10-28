@@ -94,7 +94,9 @@ class EndpointController {
 		$format = $queryParams['format'];
 	}
 	//check for resourceSync specific requests
-        if($this->requestedPath == 'sitemap.xml') {
+	if(strlen($this->requestedPath)==0) {
+		return $this->ResourceSyncService->getSitemap('json');
+	} elseif($this->requestedPath == 'sitemap.xml') {
                 return $this->ResourceSyncService->getSitemap($format);
         } elseif(strstr($this->requestedPath,'resourcelist.xml')) {
                 return $this->ResourceSyncService->getResourceList($this->requestedPath,$format,$queryParams);

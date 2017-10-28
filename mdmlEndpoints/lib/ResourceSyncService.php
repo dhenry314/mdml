@@ -74,6 +74,9 @@ class ResourceSyncService {
 	$info['updated'] = 0;
 	$info['deleted'] = 0;
 	$path = $this->getBasePath($path);
+	if($path == 'info.json') {
+		return $this->getAllEndpointsInfo();
+	}
 	//get a listing of locs
         $params = array(':path'=>$path);
         $sql = "SELECT `change` FROM `resources` WHERE `path` = :path";
@@ -86,6 +89,18 @@ class ResourceSyncService {
         }
 	$info['total'] = $total;
         return $info;
+  }
+
+  public function getAllEndpointsInfo() {
+  	$data = array();
+	$sql = "SELECT COUNT(*) AS `Rows`, `path` FROM `resources` GROUP BY `path` ORDER BY `path`";
+	$sth = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+	$sth->execute($params);
+	$total = 0;
+	while($row = $sth->fetch( PDO::FETCH_ASSOC )){
+	      $data[$row['path']] = $this->getInfo($row['path']);		//DEBUG
+	}
+	return $data;
   }
 
   public function getPathResources($path,$paging,$filter=array()) {
