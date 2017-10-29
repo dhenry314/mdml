@@ -9,6 +9,7 @@ class Ingestor extends Service {
   var $targetEndpoint;
   var $docCount = 0;
   var $messages = array();
+  var $logLevels = array("WARNING","ERROR");
 
   function __construct($serviceArgs,$request,$response,$allowablePaths) {
 	parent::__construct($serviceArgs,$request,$response,$allowablePaths);
@@ -89,7 +90,7 @@ class Ingestor extends Service {
   }
 
   public function writeToTarget($original_record,$sourceURI) {
-    $doc = new mdmlDoc($original_record,$sourceURI);
+    	$doc = new mdmlDoc($original_record,$sourceURI);
 	$json = Utils::safe_json_encode($doc);
  	$authorization = "Authorization: Bearer ".$this->jwt;
  	$ch = curl_init();
@@ -100,7 +101,7 @@ class Ingestor extends Service {
  	$result = curl_exec($ch);
  	if(curl_errno($ch)){
 		$errData = $this->getErrorData($sourceURI,$sourceURI);
-     	throw new RecordException("Curl error: "  . curl_error($ch),$errData,"ERROR");
+     		throw new RecordException("Curl error: "  . curl_error($ch),$errData,"ERROR");
  	}
  	curl_close($ch);
  	$returnObj = json_decode($result);
@@ -110,7 +111,9 @@ class Ingestor extends Service {
 	} elseif(property_exists($returnObj,'mdml:payload') && property_exists($returnObj,'mdml:sourceURI')) {
 		$this->docCount++;
 		$errData = $this->getErrorData($sourceURI,$sourceURI);
-		throw new RecordException("Record ingested.",$errData);
+		if(in_array("INFO",$this->logLevels)) {
+			throw new RecordException("Record ingested.",$errData);
+		}
 	} else {
 		$errData = $this->getErrorData($sourceURI,$sourceURI);
 		throw new RecordException("Unknown error: Could not ingest.",$errData,"ERROR");
