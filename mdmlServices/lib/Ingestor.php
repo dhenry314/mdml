@@ -9,7 +9,6 @@ class Ingestor extends Service {
   var $targetEndpoint;
   var $docCount = 0;
   var $messages = array();
-  var $logLevels = array("WARNING","ERROR");
 
   function __construct($serviceArgs,$request,$response,$allowablePaths) {
 	parent::__construct($serviceArgs,$request,$response,$allowablePaths);

@@ -47,6 +47,7 @@ class Service {
   var $serviceArgs = array();
   var $loggingServiceURI;
   var $loggingTag;
+  var $logLevels = array("WARNING","ERROR");
   var $errors=array();
   var $http_method;
   var $request;
