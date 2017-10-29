@@ -254,23 +254,29 @@ class Utils {
   }
 
   public static function postToURL($url,$data,$jwt=NULL) {
-		$headers = NULL;
-		if($jwt) {
-			$headers = "Authorization: Bearer ".$jwt;
-		}
+	$headers = NULL;
+	if($jwt) {
+		$headers = "Authorization: Bearer ".$jwt;
+	}
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $headers ));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $json = Utils::safe_json_encode($data);
-		curl_setopt($ch, CURLOPT_POSTFIELDS,$json);
-		$result = curl_exec($ch);
+	curl_setopt($ch, CURLOPT_POSTFIELDS,$json);
+	$response = curl_exec($ch);
         if(curl_errno($ch)){
               throw new \Exception("Curl error: "  . curl_error($ch));
         }
         curl_close($ch);
-        return Utils::jsonToObj($result);
+	$result = false;
+	try {
+        	$result = Utils::jsonToObj($response);
+	} catch(\Exception $e) {
+		throw new \Exception("Could not parse response from posted json. ERROR: " . $e->getMessage());
 	}
+	return $result;
+   }
 
    /**
   * Xml2Json - convert xml (DOM object) to a cooresponding json string
