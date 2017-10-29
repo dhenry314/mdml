@@ -60,7 +60,12 @@ class EndpointClient extends Service {
                    throw new EndpointClientException("Curl error: "  . curl_error($ch));
                 }
                 curl_close($ch);
-                return json_decode($result);
+		try {
+			$result = Utils::jsonToObj($result);
+		} catch(\Exception $e) {
+			throw new EndpointClientException("Could not parse response. ERROR: " . $e->getMessage());
+		}
+                return $result;
 	}
 
 	/**
