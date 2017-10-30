@@ -240,7 +240,11 @@ class jsonMapping extends Service {
         $this->currentID = $targetID;
         if(!is_object($doc)) {
                 $doc = $this->toObj($doc);
-        } 
+        }
+	if(property_exists($doc,'mdml:payload')) {
+		$doc = $doc->{'mdml:payload'};
+		$this->doc = $doc;
+	}
 	$this->parseMapVars($doc);
 	//unset mdml mapping fields
         unset($this->map->{'mdml:mapServices'});
