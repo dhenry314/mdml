@@ -130,6 +130,9 @@ class MongoStorage implements iStorage {
         if(!array_key_exists('@id',$doc)) {
               $doc['@id'] = $id;
         }
+	if(array_key_exists('_id',$doc)) {
+		unset($doc['_id']);
+	}
 	$idQuery = array('@id'=>$id);
     	try {
       		$result = $this->mongoColl->replaceOne($idQuery,$doc);
