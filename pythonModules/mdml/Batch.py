@@ -78,12 +78,19 @@ class Batch:
 			return self.runE2E(process)
 		elif serviceType == "E2S":
 			return self.runE2S(process)
+		elif serviceType == "S":
+			return self.runS(process)
 		elif serviceType == "Pipeline":
 			return self.runPipeline(process)
 		else:
 			raise ValueError("Unknown service type: " + str(serviceType))
 		return False
 	
+	def runS(self,process):
+		 parts = self.validateProcess(process)
+		 return self.callService(parts["serviceURI"],parts["service"])
+
+
 	def runS2E(self,process):
 		parts = self.validateProcess(process)
 		args = parts["service"]["args"]
