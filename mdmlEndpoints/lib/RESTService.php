@@ -179,7 +179,13 @@ class RESTService {
   }
 
   public function deleteRecord($path=NULL) {
-	if(!$path) $path = $this->path;
+	if(!$path) {
+		$path = $this->path;
+	}
+	if(!$resource = $this->resourceSyncService->getResource($path)) {
+		throw new RESTServiceException("No resource to delete.");
+	}
+	$hash = $resource['hash'];
 	$doc = $this->storage->getDocument($path);
 	$doc['mdml:status'] = 'deleted';
 	$pathParts = explode("/",$path);
@@ -189,7 +195,7 @@ class RESTService {
 						$parentPath,
 						$doc['mdml:originURI'],
 						$doc['mdml:sourceURI'],
-						NULL,
+						$hash,
 						'deleted',
 						$path)
 	) {

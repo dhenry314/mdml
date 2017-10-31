@@ -98,7 +98,7 @@ class ResourceSyncService {
 	$sth->execute($params);
 	$total = 0;
 	while($row = $sth->fetch( PDO::FETCH_ASSOC )){
-	      $data[$row['path']] = $this->getInfo($row['path']);		//DEBUG
+	      $data[$row['path']] = $this->getInfo($row['path']);		
 	}
 	return $data;
   }
@@ -265,6 +265,11 @@ class ResourceSyncService {
 
   public function saveResource($path,$originURI,$sourceURI,$hash=NULL,$change='created',$loc=NULL) {
 	$path = $this->normalizePath($path);
+	if(!$hash) {
+		throw new ResourceSyncException(
+			"Cannot save resource. Missing hash."
+		);
+	}
 	$loc = NULL;
 	$params = array(
 		':path'=>$path,
@@ -296,8 +301,7 @@ class ResourceSyncService {
 			$sql .= '`lastMod` = :lastMod WHERE `path` = :path AND `sourceURI` = :sourceURI ';
 		break;
 		case 'deleted':
-			unset($params[':hash']);
-			$sql = 'UPDATE `resources` SET `change` = :change, `hash` = NULL, ';
+			$sql = 'UPDATE `resources` SET `change` = :change, `hash` = :hash, ';
 			$sql .= '`lastMod` = :lastMod WHERE `path` = :path AND `sourceURI` = :sourceURI ';
 		break;
 		default:
