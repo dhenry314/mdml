@@ -18,6 +18,9 @@ class setDeletes extends EndpointClient {
     	public function run() {
 		foreach($this->endpoints as $endpoint) {
 			$info = $this->info($endpoint);
+			if(is_array($info)) {
+				$info = (object)$info;
+			}
 			$endpointTotal = $info->total;
 			$n=0;
 			$count = 20;
@@ -25,6 +28,9 @@ class setDeletes extends EndpointClient {
 				$paging = array('offset'=>$n,'count'=>$count);
 				$docs = $this->resourceList($endpoint,$paging);
 				foreach($docs as $doc) {
+					if(is_array($doc)) {
+						$doc = (object)$doc;
+					}
 					$url = $doc->{'mdml:sourceURI'};
 					if(!Utils::protectedURLExists($url,$this->jwt)) {
 						$this->messages[] = $url. " does not exist!";
