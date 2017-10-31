@@ -275,6 +275,11 @@ class Utils {
 	} catch(\Exception $e) {
 		throw new \Exception("Could not parse response from posted json. ERROR: " . $e->getMessage());
 	}
+	if(is_array($result)) {
+		if(array_key_exists("exception",$result)) {
+			throw new \Exception($result['exception'] . " " . $result['message']);
+		}
+	}
 	return $result;
    }
 
