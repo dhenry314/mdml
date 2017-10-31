@@ -46,7 +46,17 @@ class jsonMapping extends Service {
 	if(!$this->doc) {
 		throw new InvalidJSONMapping("Could not get input document contents from given arguments.");
 	}
-	return $this->mapRecord($this->doc);
+	try {
+	        $result = $this->mapRecord($this->doc);
+	} catch(RecordException $re) {
+	        if($re->status != 1) {
+	                throw new ServiceException($re->getMessage());
+	        }
+	} catch(\Exception $e) {
+	        throw new ServiceException("Could not process record: " . $e->getMessage());
+	}
+	$this->response = $this->mapResult;
+	return $this->mapResult;
   }
 
   protected function loadRequest($args) {
@@ -239,13 +249,21 @@ class jsonMapping extends Service {
         $this->mapResult = new \stdClass();
         $this->currentID = $targetID;
         if(!is_object($doc)) {
-                $doc = $this->toObj($doc);
+		try {
+                	$doc = $this->toObj($doc);
+		} catch (\Exception $e) { 
+                        $this->messages[] = $e->getMessage();
+                }
         }
 	if(property_exists($doc,'mdml:payload')) {
 		$doc = $doc->{'mdml:payload'};
 		$this->doc = $doc;
 	}
-	$this->parseMapVars($doc);
+	try {
+		$this->parseMapVars($doc);
+	} catch (\Exception $e) { 
+                $this->messages[] = $e->getMessage();
+        }
 	//unset mdml mapping fields
         unset($this->map->{'mdml:mapServices'});
         unset($this->map->{'mdml:mapVars'});
@@ -254,7 +272,11 @@ class jsonMapping extends Service {
 			$this->mapResult->$property = $val;
 		} 
                 if(is_string($val)) {
-			$this->mapResult->$property = $this->getVal($val);
+			try {
+				$this->mapResult->$property = $this->getVal($val);
+			} catch (\Exception $e) { 
+                                $this->messages[] = $e->getMessage();
+                        }
 		} elseif(is_array($val)) {
                         $this->mapResult->$property = $val;
                 } else {
@@ -266,6 +288,10 @@ class jsonMapping extends Service {
                 }
         }
         if(count($this->messages)>0) {
+		foreach($this->messages as $msg) {
+			$errData = $this->getErrorData($this->sourceURI,$this->originURI);
+			throw new RecordException($msg,$errData,"WARNING");
+		}
 		$this->mapResult->mappingErrors = $this->messages;
         }
         return $this->mapResult;
