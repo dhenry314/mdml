@@ -457,9 +457,27 @@ class Utils {
   }
 
   static function tagToArray($tag) {
-        $x = new \SimpleXMLElement($tag);
-        $tagData =  (array)$x;
-        return $tagData;
+	$parts = explode('=',$tag);
+	$data = array();
+	foreach($parts as $i=>$part) {
+		if(!array_key_exists($i+1,$parts)) break;
+		$sParts = explode(" ",$part);
+		$field = array_pop($sParts);
+		$vParts = explode(' ',$parts[$i+1]);
+		array_pop($vParts);
+		$v = implode(' ',$vParts);
+		//remove wrapping quotes
+		$first = substr($v,0,1);
+		if(in_array($first,array('"','\''))) {
+			$v = substr($v,1);
+		}
+		$last = substr($v,-1,1);
+		if(in_array($last,array('"','\''))) {
+			$v = substr($v,0,strlen($v)-1);
+		}
+		$data[$field] = $v;
+	} 
+	return $data;
   }
 
   
