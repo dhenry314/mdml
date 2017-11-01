@@ -1,12 +1,14 @@
 class Batch:
     
-	def __init__(self,sys,os,namedtuple,urlopen,json,u):
+	def __init__(self,sys,os,namedtuple,urlopen,json,u,Process):
 		self.urlopen = urlopen
 		self.json = json
 		self.u = u
 		self.sys = sys
 		self.os = os
 		self.namedtuple = namedtuple
+		self.process = Process
+		self.messages = []
 
 	def load(self,jwt,config):
 		self.jwt = jwt
@@ -100,35 +102,54 @@ class Batch:
 			raise ValueError("S2E service definition does NOT include mdml:targetEndpoint")
 		return self.callService(parts["serviceURI"],parts["service"])
 
-	def E2EItem(self,sourceURI,originURI,serviceURI,service,targetEndpoint):
-		service["args"]["mdml:sourceURI"] = sourceURI
+	def E2EItem(self,record,serviceURI,service,targetEndpoint):
+		service["args"]["mdml:sourceURI"] = record["loc"]
 		result = self.callService(serviceURI,service)
-		request = self.u.createEndpointRequest(sourceURI,originURI,result['result'])
-		return self.u.postMDMLService(targetEndpoint,self.jwt,request)
+		if "exception" in result:
+			print "sourceURI: " + str(record['loc'])
+			print " EXCEPTION: " + str(result['exception']) 
+			print " ERROR: " + str(result['message'])
+		request = self.u.createEndpointRequest(record['loc'],record['mdml:originURI'],result['result'])
+		try:
+			response = self.u.postMDMLService(targetEndpoint,self.jwt,request)
+		except ValueError as e:
+			raise ValueError("Could not post to " + str(targetEndpoint) + " ERROR: " + str(e))
+		self.messages.append("Mapped " + str(record['loc']))
+		return response
 
 	def E2SItem(self,sourceURI,serviceURI,service):
 		service["args"]["mdml:sourceURI"] = sourceURI
-		return self.callService(serviceURI,service)
+		result = self.callService(serviceURI,service)
+		if "exception" in result:
+			print "sourceURI: " + str(record['loc'])
+			print " EXCEPTION: " + str(result['exception']) 
+			print " ERROR: " + str(result['message'])
+		else:
+			print "sourceURI: " + str(record['loc']) + " successfully processed."
+		return result
 
-	def runE2E(self,process):
-		parts = self.validateProcess(process)
-		sourceEndpoint = self.getEndpointBase(process.sourceEndpoint)
+	def runE2E(self,processRequest):
+		parts = self.validateProcess(processRequest)
+		sourceEndpoint = self.getEndpointBase(processRequest.sourceEndpoint)
 		sourceTotal = self.getEndpointTotal(sourceEndpoint)
-		targetEndpoint = self.getEndpointBase(process.targetEndpoint)
+		targetEndpoint = self.getEndpointBase(processRequest.targetEndpoint)
 		offset=0
 		while offset < sourceTotal:
+			print "Pulling records with offset: " + str(offset)
 			records = self.getEndpointBatch(sourceEndpoint,offset,10)
+			jobs = []
 			for record in records:
-				result = self.E2EItem(record['loc'],record['mdml:originURI'],process.serviceURI,parts["service"],targetEndpoint)
-				if "exception" in result:
-					print "sourceURI: " + str(record['loc'])
-					print " EXCEPTION: " + str(result['exception']) 
-					print " ERROR: " + str(result['message'])
-				else:
-					print "sourceURI: " + str(record['loc']) + " successfully processed."
+				process = self.process(target=self.E2EItem,
+					args=(record,processRequest.serviceURI,parts['service'],targetEndpoint,))
+				jobs.append(process)
+			for j in jobs:
+				j.start()
+
+			for j in jobs:
+				j.join()
 
 			offset = offset+10
-		print "all records mapped"
+		print self.messages
 		exit()
 		
 	def runE2S(self,process):

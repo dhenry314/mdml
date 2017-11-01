@@ -6,6 +6,7 @@ import requests
 import json
 import curses
 import datetime
+from multiprocessing import Process 
 from Utils import Utils
 from TokenService import TokenService
 from CreateRequest import CreateRequest
@@ -13,4 +14,4 @@ from Batch import Batch
 Utils = Utils(requests,json,curses,datetime)
 TokenService = TokenService(urlopen,json,curses,Utils)
 CreateRequest = CreateRequest(os,json,curses)
-Batch = Batch(sys,os,namedtuple,urlopen,json,Utils)
+Batch = Batch(sys,os,namedtuple,urlopen,json,Utils,Process)
