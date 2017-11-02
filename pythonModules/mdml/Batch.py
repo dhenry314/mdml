@@ -8,7 +8,6 @@ class Batch:
 		self.os = os
 		self.namedtuple = namedtuple
 		self.process = Process
-		self.messages = []
 
 	def load(self,jwt,config):
 		self.jwt = jwt
@@ -82,8 +81,6 @@ class Batch:
 			return self.runE2S(process)
 		elif serviceType == "S":
 			return self.runS(process)
-		elif serviceType == "Pipeline":
-			return self.runPipeline(process)
 		else:
 			raise ValueError("Unknown service type: " + str(serviceType))
 		return False
@@ -114,11 +111,11 @@ class Batch:
 			response = self.u.postMDMLService(targetEndpoint,self.jwt,request)
 		except ValueError as e:
 			raise ValueError("Could not post to " + str(targetEndpoint) + " ERROR: " + str(e))
-		self.messages.append("Mapped " + str(record['loc']))
+		print "Processed " + str(record['loc'])
 		return response
 
-	def E2SItem(self,sourceURI,serviceURI,service):
-		service["args"]["mdml:sourceURI"] = sourceURI
+	def E2SItem(self,record,serviceURI,service):
+		service["args"]["mdml:sourceURI"] = record['loc']
 		result = self.callService(serviceURI,service)
 		if "exception" in result:
 			print "sourceURI: " + str(record['loc'])
@@ -126,6 +123,7 @@ class Batch:
 			print " ERROR: " + str(result['message'])
 		else:
 			print "sourceURI: " + str(record['loc']) + " successfully processed."
+		print "Processed " + str(record['loc'])
 		return result
 
 	def runE2E(self,processRequest):
@@ -136,7 +134,7 @@ class Batch:
 		offset=0
 		while offset < sourceTotal:
 			print "Pulling records with offset: " + str(offset)
-			records = self.getEndpointBatch(sourceEndpoint,offset,10)
+			records = self.getEndpointBatch(sourceEndpoint,offset,20)
 			jobs = []
 			for record in records:
 				process = self.process(target=self.E2EItem,
@@ -148,33 +146,29 @@ class Batch:
 			for j in jobs:
 				j.join()
 
-			offset = offset+10
-		print self.messages
+			offset = offset+20
+		print "All records processed."
 		exit()
 		
-	def runE2S(self,process):
-		parts = self.validateProcess(process)
-		sourceEndpoint = self.getEndpointBase(process.sourceEndpoint)
+	def runE2S(self,processRequest):
+		parts = self.validateProcess(processRequest)
+		sourceEndpoint = self.getEndpointBase(processRequest.sourceEndpoint)
 		sourceTotal = self.getEndpointTotal(sourceEndpoint)
 		offset=0
 		while offset < sourceTotal:
-			records = self.getEndpointBatch(sourceEndpoint,offset,10)
+			records = self.getEndpointBatch(sourceEndpoint,offset,20)
+			jobs = []
 			for record in records:
-				print "sourceURI: " + str(record['loc'])
-				result = self.E2SItem(record['loc'],process.serviceURI,parts["service"])
-				if "exception" in result:
-					print " EXCEPTION: " + str(result['exception']) 
-					print " ERROR: " + str(result['message'])
-				elif "fault" in result:
-					print " FAULT: " + str(result['fault']['string'])
-				else:
-					print " successfully processed. "
+				process = self.process(target=self.E2SItem,
+					args=(record,processRequest.serviceURI,parts['service'],))
+				jobs.append(process)
+			for j in jobs:
+				j.start()
 
-			offset = offset+10
-		print "all records run through service"
+			for j in jobs:
+				j.join()
+
+			offset = offset+20
+		print "All records processed."
 		exit()
 		
-	def runPipeline(self,process):
-		for service in process.services:
-			self.run(service)
-			print service
