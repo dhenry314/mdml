@@ -147,8 +147,7 @@ class Batch:
 				j.join()
 
 			offset = offset+20
-		print "All records processed."
-		exit()
+		return "All records processed."
 		
 	def runE2S(self,processRequest):
 		parts = self.validateProcess(processRequest)
@@ -169,6 +168,5 @@ class Batch:
 				j.join()
 
 			offset = offset+20
-		print "All records processed."
-		exit()
+		return "All records processed."
 		
