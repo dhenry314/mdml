@@ -2,6 +2,14 @@
 import sys,json,os.path
 from collections import namedtuple
 
+processname  = 'runPipeline.py'
+tmp = os.popen("ps -Af").read()
+proccount = tmp.count(processname)
+
+if proccount > 2:
+    print(proccount, ' processes running of ', processname, 'type')
+    exit()
+
 if not os.path.isfile('config.json'):
 	print "No config.json file found in this directory!"
 	sys.exit()
