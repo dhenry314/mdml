@@ -9,6 +9,7 @@ class Ingestor extends Service {
   var $targetEndpoint;
   var $docCount = 0;
   var $messages = array();
+  var $verbose = FALSE;
 
   function __construct($serviceArgs,$request,$response,$allowablePaths) {
 	parent::__construct($serviceArgs,$request,$response,$allowablePaths);
@@ -29,7 +30,10 @@ class Ingestor extends Service {
 
   public function run() {
 	$this->response = array("targetEndpoint"=>$this->targetEndpoint,"docCount"=>$this->docCount,
-				"messages"=>$this->messages,"errors"=>$this->errors);
+		"errors"=>$this->errors);
+	if($verbose) {
+		$this->response["messages"] = $this->messages;
+	}
 	return parent::run();
   }
 
