@@ -6,6 +6,21 @@ class TokenService:
 		self.curses = curses
 		self.u = u
 
+	def getTokenFromConfig(self,config):
+		try:
+			tokenService = config.tokenService
+			tokenUser = config.tokenUser
+			tokenPW = config.tokenPW
+		except AttributeError as e:
+			raise ValueError("Missing required config params: tokenService, tokenUser, or tokenPW")
+			return False
+		try:
+			jwt = self.callTokenService(tokenService,tokenUser,tokenPW)
+		except ValueError as e:
+			raise ValueError("Could not get token. " + str(e))
+			return False
+		return jwt
+
 	def getToken(self,tokenServiceURL):
 		screen = self.curses.initscr()
 		screen.clear()
