@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import sys,json,os.path
+import sys,argparse,json,os.path
 from collections import namedtuple
 
 processname  = 'runPipeline.py'
@@ -10,20 +10,33 @@ if proccount > 2:
     print(proccount, ' processes running of ', processname, 'type')
     exit()
 
-if not os.path.isfile('config.json'):
-	print "No config.json file found in this directory!"
+pipelineName = None
+configPath = 'config.json'
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-p', '--pipelineName')
+parser.add_argument('-c', '--configPath')
+args = parser.parse_args()
+
+pipelineName = args.pipelineName
+configPath = args.configPath
+
+if not os.path.isfile(configPath):
+	print "No config.json file found! "
 	sys.exit()
 
-with open('config.json') as json_data_file:
+with open(configPath) as json_data_file:
     configJ = json.load(json_data_file)
     config = namedtuple('config',configJ.keys())(**configJ)
 
-def loadToken():
+tokenPath = str(config.mdmlClientDir) + "_TOKEN"
+
+def loadToken(tokenPath):
 	try:
-		file = open("_TOKEN", "r") 
+		file = open(tokenPath, "r") 
 		return file.read()
 	except IOError:
-		print "_TOKEN file does not exist.  ( try ./run.py setToken)"
+		print "_TOKEN file does not exist at " + str(tokenPath) + "  ( try ./run.py setToken)"
 		exit()
 		return 0
 
@@ -44,24 +57,27 @@ sys.path.append(mdmlModules)
 from mdml import Batch
 
 try:
-	pipelineName = str(sys.argv[1])
-except IndexError as e:
-	print "No pipeline name given."
-	sys.exit()
-
-try:
 	pipeline = loadPipeline(config,pipelineName)
 except ValueError as e:
 	print "Could not load pipeline. ERROR: " + str(e)
 	sys.exit()
 
-jwt = loadToken()
+jwt = loadToken(tokenPath)
 Batch.load(jwt,config)
 results = []
 
 for processDef in pipeline:
-	processName = processDef['process']
-	option = processDef['options']
+	try:
+		processName = processDef['process']
+	except IndexError as e:
+		print "Could not load process definition.  Missing 'process'"
+		exit()
+	option = None
+	try:
+		option = processDef['options']
+	except KeyError as e:
+		print "Loading without options"
+
 	try:
 		result = Batch.run(processName,option)
 	except ValueError as e:
