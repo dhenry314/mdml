@@ -146,6 +146,9 @@ class Batch:
 			for j in jobs:
 				j.join()
 
+			if len(records) < 20:
+				break
+
 			offset = offset+20
 		return "All records processed."
 		
@@ -166,6 +169,9 @@ class Batch:
 
 			for j in jobs:
 				j.join()
+
+			if len(records) < 20:
+				break
 
 			offset = offset+20
 		return "All records processed."
