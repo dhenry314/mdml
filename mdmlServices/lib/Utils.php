@@ -182,7 +182,7 @@ class Utils {
   }
 
   public static function jsonToObj($source) {
-    $json_data = json_decode($source, true);
+    $json_data = json_decode($source);
     if($json_data == null){
       throw new \Exception(json_last_error());
     }else{
