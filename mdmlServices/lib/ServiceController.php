@@ -66,6 +66,7 @@ class ServiceController {
       } catch(\Exception $e) {
         throw new ServiceRoutingException("Could not load serviceDescription. ERROR: " . $e->getMessage());
       }
+      $serviceDescription = (array) $serviceDescription;
       if(array_key_exists('servicename',$serviceDescription)) {
         $this->serviceName = $serviceDescription['servicename'];
       }
@@ -76,18 +77,24 @@ class ServiceController {
         throw new ServiceRoutingException("No methods found in service description.");
       }
       $serviceMethods = $serviceDescription['methods'];
+      $serviceMethods = (array) $serviceMethods;
       if(!array_key_exists($methodname,$serviceMethods)) {
         throw new ServiceRoutingException("Method " . $methodname . " not found in service description.");
       }
-      $this->serviceDefinition = $serviceMethods[$methodname];
+      $this->serviceDefinition = (array) $serviceMethods[$methodname];
       //check args in the request against params defined in the serviceDefinition
       $postedArgs = array();
       if(array_key_exists('args',$this->postedData)) {
-      	$postedArgs = $this->postedData['args'];
+      	if(is_array($this->postedData)) {
+      		$postedArgs = (array) $this->postedData['args'];
+	} elseif(is_object($this->postedData)) {
+		$postedArgs = (array) $this->postedData->args;
+	}
       }
       foreach($this->serviceDefinition['params'] as $paramName=>$def) {
         $argVal = NULL;
 	$argType = 'boolean';
+	$def = (array) $def;
 	if(!$def['optional']) {
 		if(!isset($this->requestDoc->args->{$paramName})) {
 			throw new ServiceRoutingException("Param: " . $paramName . " is required.");
