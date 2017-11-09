@@ -97,21 +97,23 @@ class jsonMapping extends Service {
   }
 
   protected function cleanVal($val) {
-	if(!$val) return NULL;
+  	if (is_bool($val) === true) {
+		if(!$val) {
+			return false;
+		} else {
+			return true;
+		}
+	}
         if(is_array($val)) {
 		$newArray = array();
                 foreach($val as $k=>$part) {
-			if($nextVal = $this->cleanVal($part)) {
-                        	$newArray[$k] = $nextVal;
-			} 
+			$newArray[$k] = $this->cleanVal($part);
                 }
                 return $newArray;
         } elseif(is_object($val)) {
 		$newObj = new \stdclass();
                 foreach($val as $property=>$v) {
-			if($nextVal = $this->cleanVal($v)) {
-                                $newObj->{$property} = $nextVal;
-			} 
+			$newObj->{$property} = $this->cleanVal($v);
 		}
                 return $newObj;
         }
