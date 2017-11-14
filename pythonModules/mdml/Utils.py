@@ -28,7 +28,16 @@ class Utils:
 			response = self.requests.post(url, data=serviceJ, headers=headers)
 		except self.requests.exceptions.ConnectionError as e:
 			raise ValueError("ERROR: Connection error on " + str(url) + " \n " + str(e))
-		result_json = response.json()
+		try: 
+			result_json = response.json()
+		except ValueError as e:
+			print response.text
+			print url
+			print serviceJ
+			result = {}
+			result['exception'] = {}
+			result['exception']['message'] = "Could not parse result json."
+			return result
 		if 'ErrorMessage' in result_json:
 			raise ValueError(result_json['ErrorMessage'])
 		else: 
