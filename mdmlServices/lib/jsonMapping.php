@@ -173,6 +173,9 @@ class jsonMapping extends Service {
         foreach($obj as $property=>$val) {
                 if($method = $this->getMappingMethod($property)) {
 			if($method['type'] == 'internal') {
+			   if(!method_exists($this,$method['method'])) {
+				throw new InvalidJSONMapping("Internal method does not exist: " . $method['method']);         
+			   }
 			   if(!is_callable(array($method['object'],$method['method']))) {
 				throw new InvalidJSONMapping("Could not create callable method with given property: " . $property);
 			   }
@@ -208,7 +211,7 @@ class jsonMapping extends Service {
 		try {
                       $result = $this->mapObject($this->map->{'mdml:mapVars'});
                 } catch (\Exception $e) {
-                      throw new InvalidJSONMapping("Could not map object: " . print_r($val));
+                      throw new InvalidJSONMapping("Could not map object: " . print_r($this->map->{'mdml:mapVars'}));
                 }
 		if(is_object($result)) {
 			$this->mapVars = (array)$result;
