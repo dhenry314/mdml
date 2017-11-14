@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-c', '--configPath')
 args = parser.parse_args()
 
-configPath = args.configPath
+configpath = args.configPath
 
 if not os.path.isfile(configpath):
 	print "No config.json file found at " + str(configpath)
