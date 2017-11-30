@@ -56,6 +56,7 @@ class Service {
   var $allowablePaths;
   var $requestDoc;
   var $jwt;
+  var $serviceClient;
 
   function __construct($serviceArgs,$request,$response,$allowablePaths) {
       $this->serviceArgs = $serviceArgs;
@@ -79,6 +80,7 @@ class Service {
                 $this->jwt = array_pop($auth_parts);
         }
       }
+      $this->serviceClient = new ServiceClient($this->jwt);
   }
 
   public function run() {
@@ -138,6 +140,14 @@ class Service {
 	  
   }
   
+  public function getDocument($uri) {
+  	if(!$docResult = $this->serviceClient->get($uri)) {
+                  throw new ServiceException("Could not load input document from given sourceURI: "
+                                   . $uri);
+        }
+	return $docResult;
+  }
+
   public function URLExists($url) {
 	$file_headers = @get_headers($url);
 	if(!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found') {
