@@ -104,13 +104,13 @@ class Batch:
 		result = self.callService(serviceURI,service)
 		if "exception" in result:
 			print "sourceURI: " + str(record['loc'])
-			print " EXCEPTION: " + str(result['exception']) 
-			print " ERROR: " + str(result['message'])
+			print " EXCEPTION: " + str(result['exception']['string']) 
+			#print " ERROR: " + str(result['message'])
 			return False
 		if "fault" in result:
 			print "sourceURI: " + str(record['loc'])
 			print " EXCEPTION: " + str(result['fault'])
-			print " ERROR: " + str(result['message'])
+			#print " ERROR: " + str(result['message'])
 			return False
 		if "result" not in result:
 			raise ValueError("No result found in response: " + str(result))
