@@ -12,8 +12,6 @@ class Utils {
          } elseif(strpos($http_response_header[0], "404")) {
                 return FALSE;
          } else {
-               echo "Error getting content from ".$url ."\n";
-               echo "Trying again in 5 seconds.\n";
                sleep(5);
                Utils::getFileContents($url,$attempts+1);
          }
@@ -282,6 +280,35 @@ class Utils {
 	}
 	return $result;
    }
+
+   public static function getFromURL($url,$jwt=NULL) {
+        $headers = NULL;
+        if($jwt) {
+                $headers = "Authorization: Bearer ".$jwt;
+        }
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $headers ));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        if(curl_errno($ch)){
+              throw new \Exception("Curl error: "  . curl_error($ch));
+        }
+        curl_close($ch);
+        $result = false;
+        try {
+                $result = Utils::jsonToObj($response);
+        } catch(\Exception $e) {
+                throw new \Exception("Could not parse response from posted json. ERROR: " . $e->getMessage());
+        }
+        if(is_array($result)) {
+                if(array_key_exists("exception",$result)) {
+                        throw new \Exception($result['exception'] . " " . $result['message']);
+                }
+        }
+        return $result;
+   }
+  
 
    /**
   * Xml2Json - convert xml (DOM object) to a cooresponding json string
