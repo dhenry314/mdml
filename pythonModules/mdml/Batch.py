@@ -106,6 +106,15 @@ class Batch:
 			print "sourceURI: " + str(record['loc'])
 			print " EXCEPTION: " + str(result['exception']) 
 			print " ERROR: " + str(result['message'])
+			return False
+		if "fault" in result:
+			print "sourceURI: " + str(record['loc'])
+			print " EXCEPTION: " + str(result['fault'])
+			print " ERROR: " + str(result['message'])
+			return False
+		if "result" not in result:
+			raise ValueError("No result found in response: " + str(result))
+			return False
 		request = self.u.createEndpointRequest(record['loc'],record['mdml:originURI'],result['result'])
 		try:
 			response = self.u.postMDMLService(targetEndpoint,self.jwt,request)
