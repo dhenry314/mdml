@@ -143,9 +143,19 @@ class RESTService {
 		$this->response = $doc;
 	} else {
 		$this->setError(404);
-        return FALSE;
+        	return FALSE;
 	}
         return TRUE;
+  }
+
+  public function findRecord($query) {
+  	if($doc = $this->storage->findOne($query->query)) {
+	      $this->response = $doc;
+	} else {
+              $this->setError(404);
+  	      return FALSE;
+        }
+        return $doc;
   }
 
   public function createRecord() {
