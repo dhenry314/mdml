@@ -64,11 +64,10 @@ class fileCache extends Service {
 		       $this->uri = substr($this->uri,0,-1);
 		}
 		$path = str_replace($this->pathReplacement,$this->cacheName."/",$this->uri);
-		$localPaths = explode("/",$this->uri);
-		$fileName = array_pop($localPaths);
+		$localPaths = explode("/",$path);
+		$fileName = array_pop($localPaths) . ".json";
 		$localFolder = implode("/",$localPaths);
 		$folder = $this->cacheBase.$localFolder;
-		$folder = str_replace($this->pathReplacement,$this->cacheName."/",$folder);
 		if(!is_dir($folder)) {
 			if (!mkdir($folder, 0777, true)) {
  			   throw new InvalidFileCache('Failed to create cache folder.');
