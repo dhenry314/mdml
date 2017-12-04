@@ -8,6 +8,7 @@ class Batch:
 		self.os = os
 		self.namedtuple = namedtuple
 		self.process = Process
+		self.debug = False
 
 	def load(self,jwt,config):
 		self.jwt = jwt
@@ -17,6 +18,8 @@ class Batch:
 		self.loggingService = config.loggingService
 			
 	def validateProcess(self,process,attrs=[]):
+		if hasattr(process,'debug'):
+			self.debug = process.debug
 		parts = {}
 		try:
 			parts["serviceURI"] = process.serviceURI
@@ -105,12 +108,11 @@ class Batch:
 		if "exception" in result:
 			print "sourceURI: " + str(record['loc'])
 			print " EXCEPTION: " + str(result['exception']) 
-			#print " ERROR: " + str(result['message'])
+			print " ERROR: " + str(result['message'])
 			return False
 		if "fault" in result:
 			print "sourceURI: " + str(record['loc'])
 			print " EXCEPTION: " + str(result['fault']['string'])
-			#print " ERROR: " + str(result['message'])
 			return False
 		if "result" not in result:
 			raise ValueError("No result found in response: " + str(result))
@@ -120,7 +122,8 @@ class Batch:
 			response = self.u.postMDMLService(targetEndpoint,self.jwt,request)
 		except ValueError as e:
 			raise ValueError("Could not post to " + str(targetEndpoint) + " ERROR: " + str(e))
-		print "Processed " + str(record['loc'])
+		if self.debug:
+			print "Processed " + str(record['loc'])
 		return response
 
 	def E2SItem(self,record,serviceURI,service):
@@ -130,9 +133,10 @@ class Batch:
 			print "sourceURI: " + str(record['loc'])
 			print " EXCEPTION: " + str(result['exception']) 
 			print " ERROR: " + str(result['message'])
-		else:
+		elif self.debug:
 			print "sourceURI: " + str(record['loc']) + " successfully processed."
-		print "Processed " + str(record['loc'])
+		if self.debug:
+			print "Processed " + str(record['loc'])
 		return result
 
 	def runE2E(self,processRequest):
@@ -142,7 +146,8 @@ class Batch:
 		targetEndpoint = self.getEndpointBase(processRequest.targetEndpoint)
 		offset=0
 		while offset < sourceTotal:
-			print "Pulling records with offset: " + str(offset)
+			if self.debug:
+				print "Pulling records with offset: " + str(offset)
 			records = self.getEndpointBatch(sourceEndpoint,offset,20)
 			jobs = []
 			for record in records:
