@@ -2,52 +2,11 @@
 
 namespace mdml;
 
-class LoggingException extends \Exception{};
 class ServiceException extends \Exception{};
-class RecordException extends ServiceException {
-	
-	// logged: 0 if not logged; 1 if logged
-	var $logged = 0; 
-	
-	function __construct($msg,$errData) {
-		if(array_key_exists('loggingServiceURI',$errData)) {
-			try {
-				$this->writeToLog($msg,$errData);
-			} catch(LoggingException $e) {
-				throw new ServiceException($e->getMessage());
-			}
-			$this->status = 1;
-		} else {
-			throw new ServiceException($msg);
-		}
-	}
-	
-	private function writeToLog($msg,$errData) {
-		$data = array(
-			'mdml:sourceURI'=>$errData['mdml:sourceURI'],
-			'mdml:originURI'=>$errData['mdml:originURI'],
-			'Message'=>$msg,
-			'tag'=>$errData['loggingTag']
-		);
-		if(array_key_exists('LogLevel',$errData)) {
-			$data['LogLevel'] = $errData['LogLevel'];  
-		}
-		try {
-			Utils::postToURL($errData['loggingServiceURI'],$data,$errData['jwt']);
-		} catch(\Exception $e) {
-			throw new LoggingException("Could not write to log. ERROR: " . $e->getMessage());
-		}
-	  return TRUE;
-  }
-
-}
 
 class Service {
 
   var $serviceArgs = array();
-  var $loggingServiceURI;
-  var $loggingTag;
-  var $logLevels = array("WARNING","ERROR");
   var $errors=array();
   var $http_method;
   var $request;
@@ -60,14 +19,6 @@ class Service {
 
   function __construct($serviceArgs,$request,$response,$allowablePaths) {
       $this->serviceArgs = $serviceArgs;
-      if(array_key_exists('mdml:loggingServiceURI',$this->serviceArgs)) {
-		$this->loggingServiceURI=$this->serviceArgs['mdml:loggingServiceURI'];
-		if(!array_key_exists('mdml:loggingTag',$this->serviceArgs)) {
-			throw new LoggingException("An mdml:loggingTag is required when there is an mdml:loggingServiceURI");
-		} else {
-			$this->loggingTag = $this->serviceArgs['mdml:loggingTag'];
-		}
-	  }
       $this->http_method = $request->getMethod();
       $this->request = $request;
       $this->queryStr = $request->getUri()->getQuery();
@@ -84,7 +35,7 @@ class Service {
   }
 
   public function run() {
-         return $this->response;
+         return $this->handleResponse($this->response);
   }
   
   protected function getErrorData($sourceURI,$originURI,$level='INFO') {
@@ -93,10 +44,6 @@ class Service {
 	  $errData['mdml:originURI'] = $originURI;
 	  $errData['LogLevel'] = $level;
 	  $errData['jwt'] = $this->jwt;
-	  if($this->loggingServiceURI) {
-			$errData['loggingServiceURI'] = $this->loggingServiceURI;
-			$errData['loggingTag'] = $this->loggingTag;
-	  }
 	  return $errData;
   }
   

@@ -1,56 +1,75 @@
 class Utils:
-	
-	def __init__(self,requests,json,curses,datetime):
+
+	def __init__(self,requests,json,curses,datetime,sleep):
 		''' Constructor for this class. '''
 		self.requests = requests
 		self.json = json
 		self.curses = curses
 		self.datetime = datetime
+		self.sleep = sleep
 
-	def getMDMLResponse(self,url,token):
+	def URIFromService(self,service):
+		if 'args' in service:
+			if 'mdml:sourceURI' in service['args']:
+				return service['args']['mdml:sourceURI']
+		return False
+
+	def getMDMLResponse(self,url,token,retries=0):
 		headers = {"Authorization": "bearer " + token}
 		try:
-			response = self.requests.get(url, headers=headers)
+			response = self.requests.get(url, headers=headers, timeout=60)
 		except self.requests.exceptions.ConnectionError as e:
-			raise ValueError("ERROR: Connection error on " + str(url) + " \n " + str(e))
+			if retries > 2:
+				raise ValueError("Connection error on " + str(url) + " \n " + str(e))
+			else:
+				retries = retries + 1
+				return self.getMDMLService(url,token,retries)
+		if response.status_code != 200:
+			try:
+				error_json = response.json()
+			except ValueError as e:
+				error_json =  {"fault":{"string":"Could not parse json of error message. " + str(e)}}
+			return error_json
 		if not response:
 			raise ValueError("ERROR: No response from " + str(url))
-		result_json = response.json()
-		if 'ErrorMessage' in result_json:
-			raise ValueError(result_json['ErrorMessage'])
-		else: 
-			return result_json
-			
-	def postMDMLService(self,url,token,service):
+		try:
+			result_json = response.json()
+		except ValueError as e:
+			raise ValueError("Could not parse json from url: " + str(url) + ". ERROR: " . str(e))
+			return False
+		return result_json
+
+	def postMDMLService(self,url,token,service,retries=0):
 		headers = {"Authorization": "bearer " + token}
 		serviceJ = self.json.dumps(service)
 		try:
-			response = self.requests.post(url, data=serviceJ, headers=headers)
+			response = self.requests.post(url, data=serviceJ, headers=headers, timeout=60)
 		except self.requests.exceptions.ConnectionError as e:
-			raise ValueError("ERROR: Connection error on " + str(url) + " \n " + str(e))
-		try: 
+			if retries > 2:
+				raise ValueError("sourceURI: " + str(self.URIFromService(service)) + " SERVICE: " + str(service) + " ERROR: Connection error on " + str(url) + " \n " + str(e))
+			else:
+				retries = retries + 1
+				return self.postMDMLService(url,token,service,retries)
+		if response.status_code != 200:
+			try:
+				error_json = response.json()
+			except ValueError as e:
+				error_json =  {"fault":{"string":"Could not parse json of error message. " + str(e)}}
+			return error_json
+		try:
 			result_json = response.json()
 		except ValueError as e:
-			print response.text
-			print url
-			print serviceJ
-			result = {}
-			result['exception'] = {}
-			result['exception']['message'] = "Could not parse result json."
-			return result
-		if 'ErrorMessage' in result_json:
-			raise ValueError(result_json['ErrorMessage'])
-		else: 
-			return result_json
- 
+			result_json = {"fault":{"string":"Could not parse json. " + str(e)}}
+		return result_json
+
 	def createE2ERequest(self):
 		print('Creating an Endpoint to Endpoint request.')
-		
+
 	def showHeader(self,screen):
 		screen.addstr(1,2,"********************")
 		screen.addstr(2,2,"* MDML Console     *")
 		screen.addstr(3,2,"********************")
-		
+
 	def inputWindow(self,instruction,choices=[]):
 		screen = self.curses.initscr()
 		screen.clear()
@@ -69,7 +88,7 @@ class Utils:
 		choice = screen.getstr()
 		self.curses.endwin()
 		return choice
-		
+
 	def messageWindow(self,lines=[]):
 		screen = self.curses.initscr()
 		screen.clear()
@@ -86,17 +105,17 @@ class Utils:
 		if response:
 			self.curses.endwin()
 		return True
-		
+
 	def writeToFile(self,filePath,contents):
 		try:
-			file = open(filePath,"w") 
-			file.write(contents) 
+			file = open(filePath,"w")
+			file.write(contents)
 			file.close()
 		except IOError as e:
 			self.messageWindow(["Could not write to file. " + str(e)])
 			return False
-		return True 
-		
+		return True
+
 	def getSelection(self,key,selections):
 		if key == 'x':
 			return False
@@ -105,11 +124,17 @@ class Utils:
 		except ValueError as e:
 			return False
 		return selections[i]
-		
+
 	def getISODate(self,date=False):
-		if not date:	
+		if not date:
 			return self.datetime.datetime.utcnow().isoformat()
 		return date.isoformat()
+
+	def getRandomAlnum(self,size):
+		import random, string
+		rand_s=string.lowercase+string.digits
+		result = ''.join(random.sample(rand_s,size))
+		return result
 
 	def createEndpointRequest(self,sourceURI,originURI,payload,schema=None):
 		request = {}
@@ -122,4 +147,3 @@ class Utils:
 			return request
 		request["mdml:payloadSchema"] = schema
 		return request
-

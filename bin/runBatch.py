@@ -41,7 +41,9 @@ try:
 except ValueError as e:
 	print "Could not run batch. ERROR: " + str(e)
 	exit()
-	
+except Exception as e:
+	print "Some error occurred while loading and running. " + str(e)
+	exit()
 
 print result
 sys.exit()

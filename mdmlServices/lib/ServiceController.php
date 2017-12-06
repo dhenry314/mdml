@@ -20,7 +20,6 @@ class ServiceController {
   var $serviceDefinition;
   var $serviceDefTypes;
   var $serviceArgs = array();
-  var $byPassArgs = array('mdml:loggingServiceURI','mdml:loggingTag');
   var $service;
 
   function __construct($config,$request,$response,$allowablePaths) {
@@ -125,10 +124,6 @@ class ServiceController {
 	}
       }
       foreach($this->requestDoc->args as $argName=>$argVal) {
-		if(in_array($argName,$this->byPassArgs)) {
-				$this->serviceArgs[$argName] = $argVal;
-				continue;
-		}
 		if(!array_key_exists($argName,$this->serviceDefinition['params'])) {
 			throw new ServiceRoutingException("Argument " . $argName . " is not defined in the service definition.");
 		}
