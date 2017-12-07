@@ -51,7 +51,7 @@ class Utils {
                 	$xml_string = str_replace($ns_declaration,"",$xml_string);
         	}
 	}
-	
+
 	$attrsToRemove = array('schemaLocation','xmlns','xsi');
 
 	foreach($attrsToRemove as $attrPart) {
@@ -202,7 +202,10 @@ class Utils {
 
     // Check that URL exists
     $file_headers = @get_headers($url);
-    return !(!$file_headers || $file_headers[0] === 'HTTP/1.1 404 Not Found');
+    if(strstr($file_headers[0]," 200 ") || strstr($file_headers[0]," 301 ")) {
+       return true;
+    }
+    return false;
   }
 
   public static function protectedURLExists($url,$jwt=NULL) {
@@ -220,7 +223,7 @@ class Utils {
 	curl_setopt($ch, CURLOPT_VERBOSE, 1);
 	curl_setopt($ch, CURLOPT_HEADER, 1);
 	$response = curl_exec($ch);
-	
+
 	$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 	$output = substr($response, 0, $header_size);
 
@@ -308,7 +311,7 @@ class Utils {
         }
         return $result;
    }
-  
+
 
    /**
   * Xml2Json - convert xml (DOM object) to a cooresponding json string
@@ -412,7 +415,7 @@ class Utils {
         $xml->getName() => $propertiesArray
     );
   }
-  
+
   static function escapeJsonString($value) {
         # list from www.json.org: (\b backspace, \f formfeed)
 		//make an exception for urls
@@ -422,7 +425,7 @@ class Utils {
                 $result = str_replace($escapers, $replacements, $value);
                 return $result;
   }
- 
+
   static function JSONSearchReplacements($str,$reverse=FALSE) {
         $from = array('.@','?@','mdml:','mohub:','oai_dc:','dc:');
         $to = array('.__AT__','?__AT__','__MDML_','__MOHUB_','__OAIDC_','__DC_');
@@ -503,11 +506,11 @@ class Utils {
 			$v = substr($v,0,strlen($v)-1);
 		}
 		$data[$field] = $v;
-	} 
+	}
 	return $data;
   }
 
-  
-  
+
+
 
 }
