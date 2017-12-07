@@ -50,6 +50,9 @@ class Utils:
 			else:
 				retries = retries + 1
 				return self.postMDMLService(url,token,service,retries)
+		except self.requests.exceptions.ReadTimeout as e:
+			raise ValueError("sourceURI: " + str(self.URIFromService(service)) + " SERVICE: " + str(service) + " ERROR: " + str(e))
+
 		if response.status_code != 200:
 			try:
 				error_json = response.json()
