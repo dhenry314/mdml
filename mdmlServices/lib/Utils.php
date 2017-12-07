@@ -189,23 +189,8 @@ class Utils {
   }
 
   public static function urlExists ( $url ) {
-    // Remove all illegal characters from a url
-    $url = filter_var($url, FILTER_SANITIZE_URL);
-
-    // Validate URI
-    if (filter_var($url, FILTER_VALIDATE_URL) === FALSE
-        // check only for http/https schemes.
-        || !in_array(strtolower(parse_url($url, PHP_URL_SCHEME)), ['http','https'], true )
-    ) {
-        return false;
-    }
-
-    // Check that URL exists
-    $file_headers = @get_headers($url);
-    if(strstr($file_headers[0]," 200 ") || strstr($file_headers[0]," 301 ")) {
-       return true;
-    }
-    return false;
+    if (!$fp = curl_init($url)) return false;
+    return true;
   }
 
   public static function protectedURLExists($url,$jwt=NULL) {
