@@ -9,7 +9,7 @@ class jsonMapping extends Service {
   public $map;
   protected $mappingServices = array();
   protected $methodPrefixes = array("_path"=>"path","_var"=>"getMapVar");
-  protected $serviceClient;
+  public $serviceClient;
   protected $doc;
   protected $sourceURI;
   protected $originURI;
