@@ -34,6 +34,8 @@ class elasticsearchPublisher extends Service {
 
   public $docs = array();
 
+  public $messages = array();
+
 	/**
 	* constructor
 	*/
@@ -72,10 +74,11 @@ class elasticsearchPublisher extends Service {
 
 	public function run() {
 		$this->index();
+    $messages = json_encode($this->messages);
 		$this->response = array(
-			"content"=>"Successfully indexed " . $this->sourceURI . " to " . $this->esIndex
+			"content"=>"Successfully indexed " . $this->sourceURI . " to " . $this->esIndex . " messages: " . $messages
 		);
-		return true;
+		return $this->response;
 	}
 
 	protected function index() {
