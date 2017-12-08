@@ -84,10 +84,12 @@ class Batch:
 
 	def callService(self,serviceURI,service):
 		result = False
+		self.logger.debug("Calling service with " + str(service) + " at uri " + str(serviceURI))
 		try:
 			result = self.u.postMDMLService(serviceURI,self.jwt,service)
 		except ValueError as e:
 			self.logger.error("Could not call service at " + str(serviceURI) + " ERROR: " + str(e))
+		self.logger.debug("Service result: " + str(result))
 		return result
 
 	def validateResponse(self,result,record):
