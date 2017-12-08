@@ -6,7 +6,7 @@ use Elasticsearch\ClientBuilder;
 use \SimpleXMLElement;
 
 class InvalidElasticSearchPublisher extends \InvalidArgumentException{};
- 
+
 class elasticsearchPublisher extends Service {
 
 	/**
@@ -31,6 +31,8 @@ class elasticsearchPublisher extends Service {
 	public $serviceClient;
 
 	public $sourceDoc;
+
+  public $docs = array();
 
 	/**
 	* constructor
@@ -77,18 +79,35 @@ class elasticsearchPublisher extends Service {
 	}
 
 	protected function index() {
-		$this->sourceDoc['mdml_originURI'] = $this->originURI;
-		$params = array(
-			'index' => $this->esIndex,
-			'type' => $this->esType,
-			'id' => $this->sourceURI,
-			'body' => $this->sourceDoc
-		);
-		try {
-			$this->esColl->index($params);
-		} catch(\Exception $e) {
-			throw new \Exception("Could not index document. ERROR: " . $e->getMessage());
-		}
+      if(count($this->docs)>0) {
+          foreach($this->docs as $sourceURI=>$doc) {
+                $doc['mdml_originURI'] = $this->originURI;
+                $params = array(
+      			         'index' => $this->esIndex,
+      			         'type' => $this->esType,
+      			         'id' => $sourceURI,
+      			         'body' => $doc
+      		      );
+      		      try {
+      			         $this->esColl->index($params);
+      		      } catch(\Exception $e) {
+      			         throw new \Exception("Could not index document. ERROR: " . $e->getMessage());
+      		      }
+          }
+      } else {
+		      $this->sourceDoc['mdml_originURI'] = $this->originURI;
+		      $params = array(
+			         'index' => $this->esIndex,
+			         'type' => $this->esType,
+			         'id' => $this->sourceURI,
+			         'body' => $this->sourceDoc
+		      );
+		      try {
+			         $this->esColl->index($params);
+		      } catch(\Exception $e) {
+			         throw new \Exception("Could not index document. ERROR: " . $e->getMessage());
+		      }
+    }
 		return true;
 	}
 
@@ -100,6 +119,5 @@ class elasticsearchPublisher extends Service {
 		$this->sourceDoc = Utils::jsonToObj($docJ);
 		return true;
 	}
-	
-}
 
+}
