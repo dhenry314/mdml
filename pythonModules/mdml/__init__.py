@@ -12,7 +12,9 @@ from Utils import Utils
 from TokenService import TokenService
 from CreateRequest import CreateRequest
 from Batch import Batch
+from Reporting import Reporting
 Utils = Utils(requests,json,curses,datetime,sleep)
 TokenService = TokenService(urlopen,json,curses,Utils)
 CreateRequest = CreateRequest(os,json,curses)
 Batch = Batch(sys,os,namedtuple,urlopen,json,Utils,Process)
+Reporting = Reporting(sys,os,namedtuple)
