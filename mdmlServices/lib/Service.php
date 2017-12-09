@@ -4,6 +4,15 @@ namespace mdml;
 
 class ServiceException extends \Exception{};
 
+class RecordException extends ServiceException {
+
+       function __construct($msg,$errData) {
+               $err = Utils::safe_json_encode($errData);
+               throw new ServiceException($msg. " " . $err);
+       }
+
+}
+
 class Service {
 
   var $serviceArgs = array();
@@ -37,7 +46,7 @@ class Service {
   public function run() {
          return $this->handleResponse($this->response);
   }
-  
+
   protected function getErrorData($sourceURI,$originURI,$level='INFO') {
 	  $errData = array();
 	  $errData['mdml:sourceURI'] = $sourceURI;
@@ -46,7 +55,7 @@ class Service {
 	  $errData['jwt'] = $this->jwt;
 	  return $errData;
   }
-  
+
   public function handleResponse($response) {
 		//response MUST be either an object or an array
 		$type = gettype($response);
@@ -68,10 +77,10 @@ class Service {
 				default:
 					throw new InvalidJSONException("Unknown response type: " . $type);
 					return FALSE;
-				
+
 		}
    }
-   
+
    public function validateBySchema($doc,$schemaPath) {
 	$dereferencer  = new \League\JsonReference\Dereferencer();
 	$schema = $dereferencer->dereference($schemaPath);
@@ -84,9 +93,9 @@ class Service {
 	} else {
 		return true;
 	}
-	  
+
   }
-  
+
   public function getDocument($uri) {
   	if(!$docResult = $this->serviceClient->get($uri)) {
                   throw new ServiceException("Could not load input document from given sourceURI: "
@@ -102,7 +111,7 @@ class Service {
 	}
 	return TRUE;
   }
-  
+
 }
 
 ?>
