@@ -72,6 +72,9 @@ class Batch:
 	def getEndpointTotal(self,endpoint):
 		url = str(endpoint) + "/info.json"
 		infoJ = self.u.getMDMLResponse(url,self.jwt)
+		if not 'total' in infoJ:
+			self.logger.error("Could not load endpoint to get total.  Result: " + str(infoJ))
+			return False
 		return infoJ['total']
 
 	def getEndpointBatch(self,endpoint,offset,count):
@@ -182,6 +185,8 @@ class Batch:
 		parts = self.validateProcess(processRequest)
 		sourceEndpoint = self.getEndpointBase(processRequest.sourceEndpoint)
 		sourceTotal = self.getEndpointTotal(sourceEndpoint)
+		if not sourceTotal:
+			sourceTotal = 0
 		targetEndpoint = self.getEndpointBase(processRequest.targetEndpoint)
 		offset=0
 		while offset < sourceTotal:
@@ -206,8 +211,11 @@ class Batch:
 
 	def runE2S(self,processRequest):
 		parts = self.validateProcess(processRequest)
+		self.logger.debug("process parts: " + str(parts))
 		sourceEndpoint = self.getEndpointBase(processRequest.sourceEndpoint)
+		self.logger.debug("process sourceEndpoint: " + str(sourceEndpoint))
 		sourceTotal = self.getEndpointTotal(sourceEndpoint)
+		self.logger.debug("endpoint total: " + str(sourceTotal))
 		offset=0
 		while offset < sourceTotal:
 			records = self.getEndpointBatch(sourceEndpoint,offset,20)
