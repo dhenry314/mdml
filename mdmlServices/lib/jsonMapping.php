@@ -19,8 +19,8 @@ class jsonMapping extends Service {
   protected $mapVars = array();
 
   public function __construct($serviceArgs,$request,$response,$allowablePaths) {
-	parent::__construct($serviceArgs,$request,$response,$allowablePaths);
-	$this->loadRequest($this->serviceArgs);
+	      parent::__construct($serviceArgs,$request,$response,$allowablePaths);
+	      $this->loadRequest($this->serviceArgs);
         $this->serviceClient = new ServiceClient($this->jwt);
   }
 
@@ -30,7 +30,7 @@ class jsonMapping extends Service {
 		$this->doc = $this->serviceArgs['mdml:inputDocument'];
 	} elseif(array_key_exists('mdml:sourceURI',$this->serviceArgs)) {
 		if(!$docResult = $this->serviceClient->get($this->serviceArgs['mdml:sourceURI'])) {
-			throw new InvalidJSONMapping("Could not load input document from given sourceURI: " 
+			throw new InvalidJSONMapping("Could not load input document from given sourceURI: "
 							. $this->serviceArgs['mdml:sourceURI']);
 		}
 		if(is_object($docResult)) {
@@ -56,7 +56,8 @@ class jsonMapping extends Service {
 	        throw new ServiceException("Could not process record: " . $e->getMessage());
 	}
 	$this->response = $this->mapResult;
-	return $this->mapResult;
+  return parent::run();
+	#return $this->mapResult;
   }
 
   protected function loadRequest($args) {
@@ -139,7 +140,7 @@ class jsonMapping extends Service {
 		$result['method'] = $parts[1];
 		$result['type'] = 'internal';
 		return $result;
-	} 
+	}
 	return FALSE;
   }
 
@@ -172,77 +173,94 @@ class jsonMapping extends Service {
   protected function mapObject($obj) {
         foreach($obj as $property=>$val) {
                 if($method = $this->getMappingMethod($property)) {
-			if($method['type'] == 'internal') {
-			   if(!method_exists($this,$method['method'])) {
-				throw new InvalidJSONMapping("Internal method does not exist: " . $method['method']);         
-			   }
-			   if(!is_callable(array($method['object'],$method['method']))) {
-				throw new InvalidJSONMapping("Could not create callable method with given property: " . $property);
-			   }
-			   $val = $this->mapParams($val);
-                           //send the val as params to the method
-                           try {
+			               if($method['type'] == 'internal') {
+			                    if(!method_exists($this,$method['method'])) {
+				                        throw new InvalidJSONMapping("Internal method does not exist: " . $method['method']);
+			                    }
+			                    if(!is_callable(array($method['object'],$method['method']))) {
+				                        throw new InvalidJSONMapping("Could not create callable method with given property: " . $property);
+			                    }
+			                    $val = $this->mapParams($val);
+                          //send the val as params to the method
+                          try {
                                 if($result = $method['object']->$method['method']($val,$sourceID)) {
                                         return $result;
                                 } else {
                                         return FALSE;
                                 }
-                           } catch (\Exception $e) {
-				 $this->messages[] = $e->getMessage();
-                           }
-			} elseif($method['type'] == 'web') {
-				return $this->callMappingService($method,$val);
-			} else {
-				die("Unknown method type: " . $method['type']);
-			}
+                          } catch (\Exception $e) {
+				                        $this->messages[] = $e->getMessage();
+                          }
+			               } elseif($method['type'] == 'web') {
+				                   return $this->callMappingService($method,$val);
+			               } else {
+				                   die("Unknown method type: " . $method['type']);
+			               }
                 } elseif(is_string($val)) {
-			$obj->$property = $this->getVal($val);
-		} elseif(is_array($val)) {
-                        $obj->$property = $this->cleanVal($val);
+			               $obj->$property = $this->getVal($val);
+		            } elseif(is_array($val)) {
+                      $obj->$property = $this->cleanVal($val);
                 } elseif(is_object($val)) {
                         $obj->$property = $this->mapObject($val,$sourceID);
                 }
         }
-	return $obj;
+	      return $obj;
   }
 
    public function parseMapVars($doc) {
-	if(property_exists($this->map,'mdml:mapVars')) {
-		try {
-                      $result = $this->mapObject($this->map->{'mdml:mapVars'});
-                } catch (\Exception $e) {
-                      throw new InvalidJSONMapping("Could not map object: " . print_r($this->map->{'mdml:mapVars'}));
-                }
-		if(is_object($result)) {
-			$this->mapVars = (array)$result;
-		}
-	}
+	     if(property_exists($this->map,'mdml:mapVars')) {
+		       try {
+                $result = $this->mapObject($this->map->{'mdml:mapVars'});
+           } catch (\Exception $e) {
+                throw new InvalidJSONMapping("Could not parse map vars.  ERROR:  " . $e->getMessage());
+           }
+		       if(is_object($result)) {
+			          $this->mapVars = (array)$result;
+		       }
+	     }
    }
 
    public function getMapVar($k) {
-	if(array_key_exists($k,$this->mapVars)) {
-		return $this->mapVars[$k];
-	}
-	return NULL;
+	    if(array_key_exists($k,$this->mapVars)) {
+		      return $this->mapVars[$k];
+	    }
+	    return NULL;
    }
 
+   public function extractValue($params) {
+       	$data = NULL;
+      	$expr = NULL;
+       	if(is_array($params)) {
+     		   $data = $params['object'];
+     		   $expr = $params['path'];
+     	  } elseif(is_object($params)) {
+     		   $data = $params->object;
+     		   $expr = $params->path;
+     	  } else {
+     		  return NULL;
+     	  }
+       	$result = \mdml\Utils::JSONSearch($expr,$data);
+     	  return $result;
+   }
+
+
    public function getVal($val) {
-	$val = trim($val);
-	if(!is_string($val)) {
-		throw new \Exception("Parameter MUST be a string in getVal!");
-	}
-	if(substr($val,0,1) == "_") {
-		$valParts = explode(":",$val);
-		$prefix = array_shift($valParts);
-		$remainder = implode(":",$valParts);
-		if(array_key_exists($prefix,$this->methodPrefixes)) {
-			$methodName = $this->methodPrefixes[$prefix];
-			return $this->$methodName($remainder);
-		} else {
-			throw new \Exception("Unknown mapping prefix: " . $prefix);
-		}
-	}
-	return $this->cleanVal($val);
+	     $val = trim($val);
+	     if(!is_string($val)) {
+		       throw new \Exception("Parameter MUST be a string in getVal!");
+	     }
+	     if(substr($val,0,1) == "_") {
+		       $valParts = explode(":",$val);
+		       $prefix = array_shift($valParts);
+		       $remainder = implode(":",$valParts);
+		       if(array_key_exists($prefix,$this->methodPrefixes)) {
+			          $methodName = $this->methodPrefixes[$prefix];
+			          return $this->$methodName($remainder);
+		       } else {
+			          throw new \Exception("Unknown mapping prefix: " . $prefix);
+		       }
+	     }
+	     return $this->cleanVal($val);
    }
 
 
@@ -250,54 +268,54 @@ class jsonMapping extends Service {
         //clear any existing result
         unset($this->mapResult);
         $this->messages = array();
-	$this->mapVars = array();
+	      $this->mapVars = array();
         $this->mapResult = new \stdClass();
         $this->currentID = $targetID;
         if(!is_object($doc)) {
-		try {
-                	$doc = $this->toObj($doc);
-		} catch (\Exception $e) { 
-                        $this->messages[] = $e->getMessage();
-                }
+		        try {
+          	   $doc = $this->toObj($doc);
+		        } catch (\Exception $e) {
+               $this->messages[] = $e->getMessage();
+            }
         }
-	if(property_exists($doc,'mdml:payload')) {
-		$doc = $doc->{'mdml:payload'};
-		$this->doc = $doc;
-	}
-	try {
-		$this->parseMapVars($doc);
-	} catch (\Exception $e) { 
-                $this->messages[] = $e->getMessage();
+	      if(property_exists($doc,'mdml:payload')) {
+		        $doc = $doc->{'mdml:payload'};
+		        $this->doc = $doc;
+	      }
+	      try {
+		        $this->parseMapVars($doc);
+	      } catch (\Exception $e) {
+            $this->messages[] = $e->getMessage();
         }
-	//unset mdml mapping fields
+	      //unset mdml mapping fields
         unset($this->map->{'mdml:mapServices'});
         unset($this->map->{'mdml:mapVars'});
         foreach($this->map as $property=>$val) {
-		if($property == '@context') {
-			$this->mapResult->$property = $val;
-		} 
-                if(is_string($val)) {
-			try {
-				$this->mapResult->$property = $this->getVal($val);
-			} catch (\Exception $e) { 
-                                $this->messages[] = $e->getMessage();
-                        }
-		} elseif(is_array($val)) {
-                        $this->mapResult->$property = $val;
-                } else {
-                        try {
-                                $this->mapResult->$property = $this->mapObject($val);
-                        } catch (\Exception $e) {
-                                $this->messages[] = $e->getMessage();
-                        }
+		        if($property == '@context') {
+			           $this->mapResult->$property = $val;
+		        }
+            if(is_string($val)) {
+			           try {
+				               $this->mapResult->$property = $this->getVal($val);
+			           } catch (\Exception $e) {
+                       $this->messages[] = $e->getMessage();
                 }
+		       } elseif(is_array($val)) {
+                $this->mapResult->$property = $val;
+           } else {
+                try {
+                    $this->mapResult->$property = $this->mapObject($val);
+                } catch (\Exception $e) {
+                    $this->messages[] = $e->getMessage();
+                }
+          }
         }
         if(count($this->messages)>0) {
-		foreach($this->messages as $msg) {
-			$errData = $this->getErrorData($this->sourceURI,$this->originURI);
-			throw new RecordException($msg,$errData,"WARNING");
-		}
-		$this->mapResult->mappingErrors = $this->messages;
+		        foreach($this->messages as $msg) {
+			           $errData = $this->getErrorData($this->sourceURI,$this->originURI);
+			           throw new RecordException($msg,$errData,"WARNING");
+		        }
+		        $this->mapResult->mappingErrors = $this->messages;
         }
         return $this->mapResult;
   }
@@ -344,9 +362,9 @@ class jsonMapping extends Service {
   }
 
   public function getSourceURI() {
-	return $this->sourceURI;  
+	return $this->sourceURI;
   }
-  
+
   public function getOriginURI() {
 	return $this->originURI;
   }
