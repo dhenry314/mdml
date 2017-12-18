@@ -47,6 +47,14 @@ class Batch:
 
 		self.logger.addHandler(handler)
 
+	def unFiltered(self,record,inFilters):
+		for inFilter in inFilters:
+			if inFilter['type'] == 'inString':
+				path = inFilter['params']['path']
+				if inFilter['params']['pattern'] in record[path]:
+					return True
+		return False
+
 	def validateProcess(self,process,attrs=[]):
 		parts = {}
 		try:
@@ -57,6 +65,14 @@ class Batch:
 			parts["service"] = process.service
 		except AttributeError as e:
 			raise ValueError("No service found")
+		try:
+			parts["inFilters"] = process.inFilters
+		except AttributeError as e:
+			pass
+		try:
+			parts["outFilters"] = process.outFilters
+		except AttributeError as e:
+			pass
 		return parts
 
 	def getEndpointBase(self,url):
@@ -77,13 +93,18 @@ class Batch:
 			return False
 		return infoJ['total']
 
-	def getEndpointBatch(self,endpoint,offset,count):
+	def getEndpointBatch(self,endpoint,offset,count,inFilters=None):
 		if self.option == 'all':
 			url = str(endpoint) + "?"
 		else:
 			url = str(endpoint) + "/changelist.xml?format=json&"
 		url = url + "offset=" + str(offset) + "&count=" + str(count)
-		return self.u.getMDMLResponse(url,self.jwt)
+		results = self.u.getMDMLResponse(url,self.jwt)
+		batch = []
+		for result in results:
+			if self.unFiltered(result,inFilters):
+				batch.append(result)
+		return batch
 
 	def callService(self,serviceURI,service):
 		result = False
@@ -188,10 +209,13 @@ class Batch:
 		if not sourceTotal:
 			sourceTotal = 0
 		targetEndpoint = self.getEndpointBase(processRequest.targetEndpoint)
+		inFilters = None
+		if 'inFilters' in parts:
+			inFilters = parts['inFilters']
 		offset=0
 		while offset < sourceTotal:
 			self.logger.debug("Pulling records with offset: " + str(offset))
-			records = self.getEndpointBatch(sourceEndpoint,offset,20)
+			records = self.getEndpointBatch(sourceEndpoint,offset,20,inFilters)
 			jobs = []
 			for record in records:
 				process = self.process(target=self.E2EItem,
@@ -217,8 +241,11 @@ class Batch:
 		sourceTotal = self.getEndpointTotal(sourceEndpoint)
 		self.logger.debug("endpoint total: " + str(sourceTotal))
 		offset=0
+		inFilters = None
+		if 'inFilters' in parts:
+			inFilters = parts['inFilters']
 		while offset < sourceTotal:
-			records = self.getEndpointBatch(sourceEndpoint,offset,20)
+			records = self.getEndpointBatch(sourceEndpoint,offset,20,inFilters)
 			jobs = []
 			for record in records:
 				process = self.process(target=self.E2SItem,
