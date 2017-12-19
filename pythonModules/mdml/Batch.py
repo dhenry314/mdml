@@ -48,6 +48,8 @@ class Batch:
 		self.logger.addHandler(handler)
 
 	def unFiltered(self,record,inFilters):
+		if not inFilters:
+			return True
 		for inFilter in inFilters:
 			if inFilter['type'] == 'inString':
 				path = inFilter['params']['path']
