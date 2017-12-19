@@ -88,32 +88,32 @@ class EndpointController {
   }
 
   public function resolve() {
-	parse_str($this->queryStr, $queryParams);
-	$format = 'xml';
-	if(array_key_exists('format',$queryParams)) {
-		$format = $queryParams['format'];
-	}
-	//check for resourceSync specific requests
-	if(strlen($this->requestedPath)==0) {
-		return $this->ResourceSyncService->getSitemap('json');
-	} elseif($this->requestedPath == '_find') {
-		return $this->RESTService->findRecord($this->requestDoc);
-	} elseif($this->requestedPath == 'sitemap.xml') {
-                return $this->ResourceSyncService->getSitemap($format);
-        } elseif(strstr($this->requestedPath,'resourcelist.xml')) {
-                return $this->ResourceSyncService->getResourceList($this->requestedPath,$format,$queryParams);
-        } elseif(strstr($this->requestedPath, 'changelist.xml')) {
-		parse_str($this->queryStr, $queryParams);
-        	return $this->ResourceSyncService->getChangelist($this->requestedPath,$queryParams);
-	} elseif(strstr($this->requestedPath, 'info.json')) {
-		return $this->ResourceSyncService->getInfo($this->requestedPath);
-	} else {
-		//otherwise run a REST request
-		$this->RESTService->run();
-		return $this->RESTService->getResponse();
-	}
+    	parse_str($this->queryStr, $queryParams);
+    	$format = 'xml';
+    	if(array_key_exists('format',$queryParams)) {
+    		$format = $queryParams['format'];
+    	}
+    	//check for resourceSync specific requests
+    	if(strlen($this->requestedPath)==0) {
+    		return $this->ResourceSyncService->getSitemap('json');
+    	} elseif($this->requestedPath == '_find') {
+    		return $this->RESTService->findRecord($this->requestDoc);
+    	} elseif($this->requestedPath == 'sitemap.xml') {
+        return $this->ResourceSyncService->getSitemap($format);
+      } elseif(strstr($this->requestedPath,'resourcelist.xml')) {
+        return $this->ResourceSyncService->getResourceList($this->requestedPath,$format,$queryParams);
+      } elseif(strstr($this->requestedPath, 'changelist.xml')) {
+    		parse_str($this->queryStr, $queryParams);
+      	return $this->ResourceSyncService->getChangelist($this->requestedPath,$queryParams);
+    	} elseif(strstr($this->requestedPath, 'info.json')) {
+    		return $this->ResourceSyncService->getInfo($this->requestedPath);
+    	} else {
+    		//otherwise run a REST request
+    		$this->RESTService->run();
+    		return $this->RESTService->getResponse();
+	     }
   }
-   
+
 }
 
 ?>

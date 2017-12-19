@@ -98,7 +98,7 @@ class ResourceSyncService {
 	$sth->execute($params);
 	$total = 0;
 	while($row = $sth->fetch( PDO::FETCH_ASSOC )){
-	      $data[$row['path']] = $this->getInfo($row['path']);		
+	      $data[$row['path']] = $this->getInfo($row['path']);
 	}
 	return $data;
   }
@@ -141,21 +141,28 @@ class ResourceSyncService {
   }
 
   public function getResourcelist($path,$format='xml',$queryParams=array(),$filter=array()) {
-	$path = $this->getBasePath($path);
-	$paging = array();
-	if(array_key_exists('offset',$queryParams)) {
+	    $path = $this->getBasePath($path);
+	    $paging = array();
+	    if(array_key_exists('offset',$queryParams)) {
 	       $paging['offset'] = $queryParams['offset'];
-	}
-	if(array_key_exists('count',$queryParams)) {
+	    }
+	    if(array_key_exists('count',$queryParams)) {
 	       $paging['count'] = $queryParams['count'];
-	}
+	    }
 
-  	//get a listing of urls
-	$urls = $this->getPathResources($path,$paging,$filter);
-	if($format == 'json') {
-		\Utils::returnJSON($urls);
-	}
-	return $this->createURLSet($urls);
+      if(array_key_exists('field',$queryParams)) {
+          $filter['field']  = $queryParams['field'];
+          if(array_key_exists('value', $queryParams)) {
+            $filter['value'] = $queryParams['value'];
+          }
+      }
+
+  	  //get a listing of urls
+	    $urls = $this->getPathResources($path,$paging,$filter);
+	    if($format == 'json') {
+		    \Utils::returnJSON($urls);
+	    }
+	    return $this->createURLSet($urls);
   }
 
   public function getChangelist($path,$queryParams) {
