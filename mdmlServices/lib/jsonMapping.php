@@ -34,6 +34,10 @@ class jsonMapping extends Service {
 							. $this->serviceArgs['mdml:sourceURI']);
 		}
 		if(is_object($docResult)) {
+      if(property_exists($docResult,'ErrorMessage')) {
+        throw new InvalidJSONMapping("Could not load input document from given sourceURI: "
+                . $this->serviceArgs['mdml:sourceURI'] . "  " .$docResult->ErrorMessage);
+      }
 			$this->doc = $docResult->{'mdml:payload'};
 			$this->sourceURI = $this->serviceArgs['mdml:sourceURI'];
 			$this->originURI = $docResult->{'mdml:originURI'};
