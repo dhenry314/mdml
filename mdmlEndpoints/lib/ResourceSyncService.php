@@ -156,7 +156,6 @@ class ResourceSyncService {
             $filter['value'] = $queryParams['value'];
           }
       }
-
   	  //get a listing of urls
 	    $urls = $this->getPathResources($path,$paging,$filter);
 	    if($format == 'json') {
