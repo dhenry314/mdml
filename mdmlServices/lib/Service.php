@@ -44,7 +44,8 @@ class Service {
   }
 
   public function run() {
-         return $this->handleResponse($this->response);
+         $this->response = $this->handleResponse($this->response);
+         return true;
   }
 
   protected function getErrorData($sourceURI,$originURI,$level='INFO') {

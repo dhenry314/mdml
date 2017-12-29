@@ -170,7 +170,7 @@ class ServiceController {
 	}
 	$this->service = new $serviceClass($this->serviceArgs,$this->request,$this->response,$this->allowablePaths);
 	$serviceResult = $this->service->run();
-	return $this->getWSPResponse($serviceResult);
+	return $this->getWSPResponse($this->service->response);
   }
   
 }
