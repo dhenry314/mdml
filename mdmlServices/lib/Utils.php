@@ -259,7 +259,10 @@ class Utils {
 	try {
         	$result = Utils::jsonToObj($response);
 	} catch(\Exception $e) {
-		throw new \Exception("Could not parse response from posted json. ERROR: " . $e->getMessage());
+		throw new \Exception("Could not parse response from POST request. 
+                         URL: " . $url .
+                         " RESPONSE: " . $response .
+                         " ERROR: " . $e->getMessage());
 	}
 	if(is_array($result)) {
 		if(array_key_exists("exception",$result)) {
@@ -287,7 +290,10 @@ class Utils {
         try {
                 $result = Utils::jsonToObj($response);
         } catch(\Exception $e) {
-                throw new \Exception("Could not parse response from posted json. ERROR: " . $e->getMessage());
+                throw new \Exception("Could not parse response from GET request. 
+			URL: " . $url .
+			" RESPONSE: " . $response .
+			" ERROR: " . $e->getMessage());
         }
         if(is_array($result)) {
                 if(array_key_exists("exception",$result)) {
