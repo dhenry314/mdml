@@ -58,12 +58,18 @@ class fileCache extends Service {
 		return true;
 	}
 
-	protected function saveToCache() {
-		//remove trailing slash
-		if(substr($this->uri,-1,1) == "/") {
-		       $this->uri = substr($this->uri,0,-1);
+	protected function saveToCache($uri=NULL,$record=NULL) {
+		if(!$uri) {
+			$uri = $this->uri;
 		}
-		$path = str_replace($this->pathReplacement,$this->cacheName."/",$this->uri);
+		if(!$record) {
+			$record = $this->sourceDoc;
+		}
+		//remove trailing slash
+		if(substr($uri,-1,1) == "/") {
+		       $uri = substr($uri,0,-1);
+		}
+		$path = str_replace($this->pathReplacement,$this->cacheName."/",$uri);
 		$localPaths = explode("/",$path);
 		$fileName = array_pop($localPaths) . ".json";
 		$localFolder = implode("/",$localPaths);
@@ -74,7 +80,7 @@ class fileCache extends Service {
 			}
 		}
 		$path = $folder."/".$fileName;
-		$sourceJson = Utils::safe_json_encode($this->sourceDoc);
+		$sourceJson = Utils::safe_json_encode($record);
 		if (!$handle = fopen($path, 'w')) {
          		throw new InvalidFileCache("Cannot open file ($path)");
     		}
