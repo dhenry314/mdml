@@ -3,6 +3,9 @@
 namespace mdml;
 
 class MDMLExceptionHandler {
+  
+   private $debug = FALSE; /* will show full trace when set to TRUE */
+
    public function __invoke($request, $response, $e) {
      // create a JSON-WSP Fault wrapper
      $fault = new \stdclass;
@@ -18,8 +21,10 @@ class MDMLExceptionHandler {
       }
       $data['message'] = $e->getMessage();
       $fault->fault->string = $data['message'];
-      $data['trace'] = $e->getTrace();
-      $fault->fault->detail = $data;
+      if($this->debug) {
+      	$data['trace'] = $e->getTrace();
+      	$fault->fault->detail = $data;
+      }
       return $response
             ->withStatus(500)
             ->withHeader('Content-Type', 'application/json')
