@@ -8,6 +8,7 @@ class PushService extends \mdml\Service {
 	var $process;
 	var $processes = array();
 	var $messages = array();
+	var $startTime;
 
     function __construct($serviceArgs,$request,$response,$allowablePaths) {
       parent::__construct($serviceArgs,$request,$response,$allowablePaths);
@@ -31,6 +32,7 @@ class PushService extends \mdml\Service {
 	}
 
 	public function run() {
+		$this->startTime = microtime(true);
 		//Iterate through processes and run each
 		// the first sourceEndpoint MUST have the originURI in it; If not, it MUST be written to it
 		$firstProcess = array_shift($this->processes);
@@ -45,7 +47,8 @@ class PushService extends \mdml\Service {
 		array_unshift($this->processes,$firstProcess);
 		foreach($this->processes as $nextProcess) {
 			if(!$this->runProcess($nextProcess)) continue;
-			$this->messages[] = "Processed " . $nextProcess->service->methodname;
+			$elapsedTime = microtime(true) - $this->startTime;
+			$this->messages[] = "Processed " . $nextProcess->service->methodname . " in " $elapsedTime;
 		}
 		$this->response = $this->messages;
 		parent::run();
@@ -62,6 +65,7 @@ class PushService extends \mdml\Service {
 				$returnObj = $this->writeToTarget($result->result,$process->targetEndpoint,$sourceURI,$this->originURI);
 			}
 		}
+		
 		return TRUE;
 	}
     
