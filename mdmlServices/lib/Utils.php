@@ -140,6 +140,26 @@ class Utils {
          $string = preg_replace('/[[:^print:]]/', '', $string);
          return preg_replace ('/[^\x{0009}\x{000a}\x{000d}\x{0020}-\x{D7FF}\x{E000}-\x{FFFD}]+/u', ' ', $string);
    }
+   
+   public static function numToHash($dividend) {
+		$alphabet = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z','A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z','0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
+        	$hash = '';
+        	$hashDigits = array();
+        	$remainder = 0;
+
+        	while ($dividend > 0) {
+            		$remainder = floor($dividend % 62);
+            		$dividend = floor($dividend / 62);
+            		array_unshift($hashDigits, $remainder);
+        	}
+
+        	foreach ($hashDigits as $v) {
+            		$hash .= $alphabet[$v];
+        	}
+
+        	return $hash;
+    	}
+
 
    public static function hashFromContents($contents) {
         if(!is_string($contents)) {
