@@ -37,18 +37,18 @@ class PushService extends \mdml\Service {
 		// the first sourceEndpoint MUST have the originURI in it; If not, it MUST be written to it
 		$firstProcess = array_shift($this->processes);
 		$firstSourceEndpoint = $firstProcess->sourceEndpoint;
+		if(!$original_record = \mdml\Utils::getFromURL($this->originURI,$this->jwt)) {
+			throw new \mdml\ServiceException("Could not load " . $this->originURI);
+		}
+		$this->writeToTarget($original_record,$firstSourceEndpoint,$this->originURI);
 		if(!$firstSourceURI = $this->getSourceURI($firstSourceEndpoint,$this->originURI)) {
-			$original_record = \mdml\Utils::getFromURL($this->originURI,$this->jwt);
-			$this->writeToTarget($original_record,$firstSourceEndpoint,$this->originURI);
-			if(!$firstSourceURI = $this->getSourceURI($firstSourceEndpoint,$this->originURI)) {
-				throw new \mdml\ServiceException("Could not get sourceURI from originURI: " . $this->originURI);
-			}
+			throw new \mdml\ServiceException("Could not get sourceURI from originURI: " . $this->originURI);
 		}
 		array_unshift($this->processes,$firstProcess);
 		foreach($this->processes as $nextProcess) {
 			if(!$this->runProcess($nextProcess)) continue;
 			$elapsedTime = microtime(true) - $this->startTime;
-			$this->messages[] = "Processed " . $nextProcess->service->methodname . " in " $elapsedTime;
+			$this->messages[] = "Processed " . $nextProcess->service->methodname . " in " . $elapsedTime;
 		}
 		$this->response = $this->messages;
 		parent::run();
@@ -73,6 +73,15 @@ class PushService extends \mdml\Service {
 		if(!$originURI) $originURI = $sourceURI;
 		$doc = new \mdml\mdmlDoc($original_record,$sourceURI,$originURI);
 		$json = Utils::safe_json_encode($doc);
+		//remove filename from target endpoint
+		$eParts = explode(".",$targetEndpoint);
+		$ext = array_pop($eParts);
+		if(in_array($ext, array('json','xml'))) {
+			$sParts = explode("/",$targetEndpoint);
+			array_pop($sParts);
+			$targetEndpoint = implode("/",$sParts);
+			$targetEndpoint = $targetEndpoint . "/";
+		}
 		$authorization = "Authorization: Bearer ".$this->jwt;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $targetEndpoint);
