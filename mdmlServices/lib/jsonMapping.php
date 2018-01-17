@@ -395,6 +395,18 @@ class jsonMapping extends Service {
   public function strReplace($params) {
 	return str_replace($params->search,$params->replace,$params->subject);
   }
+
+  public function toLower($params) {
+  	$str = NULL;
+  	if(!property_exists($params,'str')) return FALSE;
+	if(is_array($params->str)) {
+		$str = $params->str[0];
+	} else {
+		$str = $params->str;
+	}
+	return strtolower($str);
+  }
+
 }
 
 ?>
