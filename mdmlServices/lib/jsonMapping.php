@@ -187,7 +187,7 @@ class jsonMapping extends Service {
 			                    $val = $this->mapParams($val);
                           //send the val as params to the method
                           try {
-                                if($result = $method['object']->$method['method']($val,$this->sourceID)) {
+                                if($result = $method['object']->$method['method']($val,$this->sourceURI)) {
                                         return $result;
                                 } else {
                                         return FALSE;
