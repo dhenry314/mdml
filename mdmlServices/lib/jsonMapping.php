@@ -20,7 +20,7 @@ class jsonMapping extends Service {
 
   public function __construct($serviceArgs,$request,$response,$allowablePaths) {
 	      parent::__construct($serviceArgs,$request,$response,$allowablePaths);
-	      $this->loadRequest($this->serviceArgs);
+      $this->loadRequest($this->serviceArgs);
         $this->serviceClient = new ServiceClient($this->jwt);
   }
 
@@ -124,7 +124,7 @@ class jsonMapping extends Service {
         }
         $val = stripcslashes($val);
         $val = html_entity_decode($val);
-        $val = urldecode($val);
+        #$val = urldecode($val);
 	if(strlen($val)==0) return NULL;
         return $val;
   }
@@ -177,14 +177,14 @@ class jsonMapping extends Service {
   protected function mapObject($obj) {
         foreach($obj as $property=>$val) {
                 if($method = $this->getMappingMethod($property)) {
-			               if($method['type'] == 'internal') {
-			                    if(!method_exists($this,$method['method'])) {
-				                        throw new InvalidJSONMapping("Internal method does not exist: " . $method['method']);
-			                    }
-			                    if(!is_callable(array($method['object'],$method['method']))) {
-				                        throw new InvalidJSONMapping("Could not create callable method with given property: " . $property);
-			                    }
-			                    $val = $this->mapParams($val);
+		    if($method['type'] == 'internal') {
+		       if(!method_exists($this,$method['method'])) {
+		           throw new InvalidJSONMapping("Internal method does not exist: " . $method['method']);
+		       }
+		       if(!is_callable(array($method['object'],$method['method']))) {
+		           throw new InvalidJSONMapping("Could not create callable method with given property: " . $property);
+		       }
+		       $val = $this->mapParams($val);
                           //send the val as params to the method
                           try {
                                 if($result = $method['object']->$method['method']($val,$this->sourceURI)) {
