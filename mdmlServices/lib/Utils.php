@@ -324,6 +324,39 @@ class Utils {
    }
 
 
+  public static function deleteFromURL($url,$jwt=NULL) {
+	$headers = NULL;
+	if($jwt) {
+		$headers = "Authorization: Bearer ".$jwt;
+	}
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $headers ));
+	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$response = curl_exec($ch);
+        if(curl_errno($ch)){
+              throw new \Exception("Curl error: "  . curl_error($ch));
+        }
+        curl_close($ch);
+	$result = false;
+	try {
+        	$result = Utils::jsonToObj($response);
+	} catch(\Exception $e) {
+		throw new \Exception("Could not parse response from DELETE request. 
+                         URL: " . $url .
+                         " RESPONSE: " . $response .
+                         " ERROR: " . $e->getMessage());
+	}
+	if(is_array($result)) {
+		if(array_key_exists("exception",$result)) {
+			throw new \Exception($result['exception'] . " " . $result['message']);
+		}
+	}
+	return $result;
+   }
+
+
    /**
   * Xml2Json - convert xml (DOM object) to a cooresponding json string
   * @param xml - a dom object from xml
