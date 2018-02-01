@@ -46,27 +46,41 @@ class PushService extends \mdml\Service {
 		}
 		array_unshift($this->processes,$firstProcess);
 		foreach($this->processes as $nextProcess) {
-			if(!$this->runProcess($nextProcess)) continue;
+			$processResult = $this->runProcess($nextProcess);
+			if(!$processResult) {
+				$msg = "Could not process " . $nextProcess->service->methodname;
+				$this->messages[] = $msg;
+				continue;
+			}
 			$elapsedTime = microtime(true) - $this->startTime;
-			$this->messages[] = "Processed " . $nextProcess->service->methodname . " in " . $elapsedTime;
+			if(property_exists($processResult,'fault')) {
+				$msg = "Could not process " . $nextProcess->service->methodname;
+				$msg .= " faultcode:  " . $processResult->fault->code;
+				$msg .= " faultstr: " . $processResult->fault->string;
+			} else {
+				$msg = "Processed " . $nextProcess->service->methodname . " in " . $elapsedTime;
+			}
+			$this->messages[] = $msg;
 		}
 		$this->response = $this->messages;
 		parent::run();
     }
     
     protected function runProcess($process) {
-		if(!property_exists($process,"sourceEndpoint")) return FALSE;
+    		if(!property_exists($process,"sourceEndpoint")) return FALSE;
 		$sourceURI = $this->getSourceURI($process->sourceEndpoint,$this->originURI);
 		if(!property_exists($process->service->args,"mdml:sourceURI")) return FALSE;
 		$process->service->args->{'mdml:sourceURI'} = $sourceURI;
 		$process->service->args->{'mdml:originURI'} = $this->originURI;
+		$returnObj = FALSE;
 		if($result = \mdml\Utils::postToURL($process->serviceURI,$process->service,$this->jwt)) {
 			if(property_exists($process,'targetEndpoint')) {
 				$returnObj = $this->writeToTarget($result->result,$process->targetEndpoint,$sourceURI,$this->originURI);
+			} else {
+				$returnObj = $result;
 			}
 		}
-		
-		return TRUE;
+		return $returnObj;
 	}
     
     protected function writeToTarget($original_record,$targetEndpoint,$sourceURI,$originURI=NULL) {
