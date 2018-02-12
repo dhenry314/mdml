@@ -186,13 +186,15 @@ class Batch:
 		if not self.validateResponse(result,record):
 			return False
 		request = self.u.createEndpointRequest(record['loc'],record['mdml:originURI'],result['result'])
+		response = None
 		try:
 			response = self.u.postMDMLService(targetEndpoint,self.jwt,request)
 		except ValueError as e:
 			self.logger.error("sourceURI: " + str(record['loc']) + " EXCEPTION: " + "Could not post to " + str(targetEndpoint) + " ERROR: " + str(e))
-		if not self.validateResponse(response,request):
-			return False
-		self.logger.info("Processed " + str(record['loc']))
+		if response:
+			if not self.validateResponse(response,request):
+				return False
+			self.logger.info("Processed " + str(record['loc']))
 		return response
 
 	def E2SItem(self,record,serviceURI,service):
