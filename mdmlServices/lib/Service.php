@@ -3,7 +3,7 @@
 namespace mdml;
 
 class ServiceException extends \Exception{};
-class InvalidJSONException extends \Exception{};
+//class InvalidJSONException extends \Exception{};
 
 class RecordException extends ServiceException {
 
