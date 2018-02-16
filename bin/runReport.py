@@ -2,6 +2,7 @@
 import sys,argparse,os.path,json,time
 from datetime import datetime, timedelta
 from collections import namedtuple
+from collections import OrderedDict
 
 configPath = 'config.json'
 
@@ -43,6 +44,12 @@ from mdml import Utils
 Reporting.load(config)
 if reportName == 'summary':
     report = Reporting.summary(hoursPast)
+    alertLevels = config.alertLevels
+    for k,v in report.items():
+        for k1,v1 in report[k].items():
+            if k1 in alertLevels:
+                print(str(k1) + ": " + str(v1) )
+                break
 elif reportName == 'byLevel':
     report = Reporting.byLevel(level,hoursPast)
 
@@ -51,5 +58,7 @@ if isinstance(report,list):
         print(line)
 else:
     print(report)
+
+
 
 sys.exit()
