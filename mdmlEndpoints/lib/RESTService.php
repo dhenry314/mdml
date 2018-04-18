@@ -170,6 +170,9 @@ class RESTService {
 	if($loc = $this->resourceSyncService->saveResource($this->path,$posted['mdml:originURI'],$posted['mdml:sourceURI'],$hash)) {
 		$this->storage->upsert($posted,$loc);
 	}
+	//add loc to posted as "@id"
+	$posted["@id"] = $this->config['HTTP_PROTOCOL']."://".$_SERVER['SERVER_NAME'];
+	$posted["@id"] .= $this->config['BASE_PATH'].$loc;
 	$this->response = $posted;
   }
 
