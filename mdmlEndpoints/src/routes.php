@@ -2,6 +2,9 @@
 // Routes
 
 
+//Enable CORS
+$app->options('/{name:.+}', \Core\Http\CorsAction::class);
+
 $app->any('/{path:.*}', function($request,$response,$args) {
     global $allowablePaths;
     if(strstr($args['path'],'loggingService')) {
