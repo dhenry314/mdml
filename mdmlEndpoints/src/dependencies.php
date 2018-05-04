@@ -1,4 +1,6 @@
 <?php
+namespace Core\Http;
+
 // DIC configuration
 
 $container = $app->getContainer();
@@ -17,3 +19,13 @@ $container['logger'] = function ($c) {
     $logger->pushHandler(new Monolog\Handler\StreamHandler($settings['path'], $settings['level']));
     return $logger;
 };
+
+class CorsAction
+{
+    public function __invoke(\Slim\Http\Request $request, \Slim\Http\Response $response) {
+         return $response->withHeader('Access-Control-Allow-Origin', '*')
+		->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+             ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    }
+}
+
