@@ -149,13 +149,25 @@ class RESTService {
   }
 
   public function findRecord($query) {
-  	if($doc = $this->storage->findOne($query->query)) {
-	      $this->response = $doc;
+  	$paging = array();
+	if(property_exists($query,'offset')) {
+		$paging['offset'] = $query->offset;
+	}
+	if(property_exists($query,'count')) {
+		$paging['count'] = $query->count;
+	}
+
+  	if($results = $this->storage->getResults($query->query,$paging)) {
+	      if(count($results)==1) {
+	      	$this->response = $results[0];
+	      } else {
+		$this->response = $results;
+	      }
 	} else {
               $this->setError(404);
   	      return FALSE;
         }
-        return $doc;
+	return $this->response;
   }
 
   public function createRecord() {
