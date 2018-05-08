@@ -14,10 +14,18 @@ $reqPath = str_replace($config['BASE_PATH'], '', $_SERVER['REQUEST_URI']);
 $reqParts = explode('?',$reqPath);
 $reqPath = array_shift($reqParts);
 if($reqPath=='/login' || $reqPath=='login' || $reqPath=='login/') {
-  $response = array('ERROR'=>'Username/password combination incorrect.');
-  if($data = \User::auth($config,$_GET['username'],$_GET['password'])) {
-    $jwt = JWT::encode($data, $config["JWT_SECRET"]);
-    $response = array("JWT"=>$jwt,"instructions"=>"Add an Authorization header in all requests with the value 'Bearer jwt'");
+  if(array_key_exists('msjwt',$_REQUEST)) {
+  	$response = array('ERROR'=>'Incorrect token!');
+  	if($data = \User::tokenauth($config,$_REQUEST['msjwt'])) {
+    		$jwt = JWT::encode($data, $config["JWT_SECRET"]);
+    		$response = array("JWT"=>$jwt,"instructions"=>"Add an Authorization header in all requests with the value 'Bearer jwt'");
+  	}
+  } else {
+  	$response = array('ERROR'=>'Username/password combination incorrect.');
+  	if($data = \User::auth($config,$_GET['username'],$_GET['password'])) {
+    		$jwt = JWT::encode($data, $config["JWT_SECRET"]);
+    		$response = array("JWT"=>$jwt,"instructions"=>"Add an Authorization header in all requests with the value 'Bearer jwt'");
+  	}
   }
   header('Content-type: application/json');
   echo json_encode( $response );

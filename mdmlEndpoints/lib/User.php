@@ -19,6 +19,23 @@ class User {
     return FALSE;
   }
   
+  public static function tokenauth($config,$msjwt) {
+    include("../Users.php");
+    if(!array_key_exists('tokenUser',$Users)) return FALSE;
+    $data = array();
+    $data['msjwt'] = $msjwt;
+    $contents = Utils::postToURL($config['TOKEN_CHECK_PATH'],$data);
+    if($contents['msjwt'] == $data['msjwt']) {
+	$data = array();
+	$data['iss'] = $config['JWT_ISSUER'];
+	$data['iat'] = time();
+	$data['exp'] = time() + $config['JWT_TTL_SECS'];
+	$data['aud'] = $Users[$user]['paths'];
+	return $data;
+    }	
+    return FALSE;
+  }
+
   public static function getJWT() {
     $authParts = explode(' ',$_SERVER['HTTP_AUTHORIZATION']);
     array_shift($authParts);

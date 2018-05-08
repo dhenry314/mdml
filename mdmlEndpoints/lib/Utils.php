@@ -129,6 +129,43 @@ class Utils {
     }
   }
 
+  public static function postToURL($url,$data,$jwt=NULL) {
+	$headers = NULL;
+	if($jwt) {
+		$headers = "Authorization: Bearer ".$jwt;
+	}
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	if(is_array($data)) {
+		curl_setopt($ch, CURLOPT_POSTFIELDS,$data);
+	} else {
+        	$json = Utils::safe_json_encode($data);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $headers ));
+		curl_setopt($ch, CURLOPT_POSTFIELDS,$json);
+	}
+	$response = curl_exec($ch);
+        if(curl_errno($ch)){
+              throw new \Exception("Curl error: "  . curl_error($ch));
+        }
+        curl_close($ch);
+	$result = false;
+	try {
+        	$result = Utils::jsonToObj($response);
+	} catch(\Exception $e) {
+		throw new \Exception("Could not parse response from POST request. 
+                         URL: " . $url .
+                         " RESPONSE: " . $response .
+                         " ERROR: " . $e->getMessage());
+	}
+	if(is_array($result)) {
+		if(array_key_exists("exception",$result)) {
+			throw new \Exception($result['exception'] . " " . $result['message']);
+		}
+	}
+	return $result;
+   }
+
   public static function urlExists ( $url ) {
     // Remove all illegal characters from a url
     $url = filter_var($url, FILTER_SANITIZE_URL);
