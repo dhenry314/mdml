@@ -14,7 +14,13 @@ $reqPath = str_replace($config['BASE_PATH'], '', $_SERVER['REQUEST_URI']);
 $reqParts = explode('?',$reqPath);
 $reqPath = array_shift($reqParts);
 if($reqPath=='/login' || $reqPath=='login' || $reqPath=='login/') {
-  if(array_key_exists('msjwt',$_REQUEST)) {
+  $response = array("ERROR"=>"Unauthorized!");
+  if(isset($_SERVER['PHP_AUTH_USER'])) {
+	if($data = \User::auth($config,$_SERVER['PHP_AUTH_USER'],$_SERVER['PHP_AUTH_PW'])) {
+	    $jwt = JWT::encode($data, $config["JWT_SECRET"]);
+	    $response = array("JWT"=>$jwt,"instructions"=>"Add an Authorization header in all requests with t    he value 'Bearer jwt'");
+	}
+  } elseif(array_key_exists('msjwt',$_REQUEST)) {
   	$response = array('ERROR'=>'Incorrect token!');
   	if($data = \User::tokenauth($config,$_REQUEST['msjwt'])) {
     		$jwt = JWT::encode($data, $config["JWT_SECRET"]);
