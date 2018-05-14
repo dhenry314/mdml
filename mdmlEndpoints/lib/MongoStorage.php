@@ -179,7 +179,7 @@ class MongoStorage implements iStorage {
 
   public function getResults($query,$paging=NULL) {
     $options = array();
-    if($paging['count']) {
+    if(array_key_exists('count',$paging)) {
       if($paging['count'] > $this->maxResults) {
         throw new StorageQueryException('Count value given exceed maximum count: ' . $this->maxResults);
       }
@@ -187,7 +187,7 @@ class MongoStorage implements iStorage {
     } else {
       $options['limit'] = $this->maxResults;
     }
-    if($paging['offset']) {
+    if(array_key_exists('offset',$paging)) {
       $options['skip'] = $paging['offset'];
     }
     try {
