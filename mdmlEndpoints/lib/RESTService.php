@@ -32,12 +32,6 @@ class RESTService {
     $storageClass = chr(92).$config['storageClass'];
     $this->storage = new $storageClass();
 	if($postedData) $this->postedData = $postedData;
-	//reconcile missing payload
-	if(!array_key_exists('mdml:payload',$this->postedData)) {
-		//get payload from mdml:sourceURI
-		$contents = Utils::getFileContents($this->postedData['mdml:sourceURI']);
-		$this->postedData['mdml:payload'] = json_decode($contents);
-	}
 	if($queryStr) {
 		parse_str($queryStr,$params);
 		if(array_key_exists('offset',$params)) {
@@ -177,6 +171,7 @@ class RESTService {
   }
 
   public function createRecord() {
+        $this->reconcilePayload();
 	$posted = $this->postedData;
 	$required = array("mdml:originURI","mdml:sourceURI","mdml:payload");
 	foreach($required as $reqField) {
@@ -192,6 +187,7 @@ class RESTService {
   }
 
   public function updateRecord() {
+  	$this->reconcilePayload();
 	$posted = $this->postedData;
 	$required = array("mdml:originURI","mdml:sourceURI","mdml:payload");
 	foreach($required as $reqField) {
@@ -258,6 +254,15 @@ class RESTService {
 	$response = array();
 	$response['mdml:message'] = $msg;
 	$this->response = $response;
+  }
+
+  private function reconcilePayload() {
+       if(!array_key_exists('mdml:payload',$this->postedData)) {
+             //get payload from mdml:sourceURI
+             $contents = Utils::getFileContents($this->postedData['mdml:sourceURI']);
+             $this->postedData['mdml:payload'] = json_decode($contents);
+       }
+       return TRUE;
   }
 
 }
