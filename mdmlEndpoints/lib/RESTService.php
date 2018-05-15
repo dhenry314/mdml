@@ -32,6 +32,12 @@ class RESTService {
     $storageClass = chr(92).$config['storageClass'];
     $this->storage = new $storageClass();
 	if($postedData) $this->postedData = $postedData;
+	//reconcile missing payload
+	if(!array_key_exists('mdml:payload',$this->postedData)) {
+		//get payload from mdml:sourceURI
+		$contents = Utils::getFileContents($this->postedData['mdml:sourceURI']);
+		$this->postedData['mdml:payload'] = json_decode($contents);
+	}
 	if($queryStr) {
 		parse_str($queryStr,$params);
 		if(array_key_exists('offset',$params)) {
