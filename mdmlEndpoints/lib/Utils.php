@@ -10,8 +10,8 @@ class Utils {
          } elseif(strpos($http_response_header[0], "404")) {
                 return FALSE;
          } else {
-               echo "Error getting content from ".$url ."\n";
-               echo "Trying again in 5 seconds.\n";
+               //echo "Error getting content from ".$url ."\n";
+               //echo "Trying again in 5 seconds.\n";
                sleep(5);
                Utils::getFileContents($url,$attempts+1);
          }
