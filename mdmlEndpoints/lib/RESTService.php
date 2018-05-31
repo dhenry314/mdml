@@ -16,6 +16,7 @@ class RESTService {
   var $config;
   var $response;
   var $resourceSyncService;
+  var $forceUpdate = FALSE;
 
   public function __construct($path,$httpMethod='GET',$postedData=NULL,$queryStr=NULL) {
 	$config = include __DIR__ . '/../config.php';
@@ -31,7 +32,13 @@ class RESTService {
 	}
     $storageClass = chr(92).$config['storageClass'];
     $this->storage = new $storageClass();
-	if($postedData) $this->postedData = $postedData;
+	if($postedData) {
+		$this->postedData = $postedData;
+		if(array_key_exists("mdml:forceUpdate",$this->postedData)) {
+			$this->forceUpdate = $this->postedData["mdml:forceUpdate"];
+		}
+	}
+
 	if($queryStr) {
 		parse_str($queryStr,$params);
 		if(array_key_exists('offset',$params)) {
@@ -179,9 +186,16 @@ class RESTService {
 			throw new RESTServiceException("Missing required field: " . $reqField);
 		}
 	}
+	$forceUpdate = FALSE;
+	if(array_key_exists("mdml:forceUpdate",$posted)) $forceUpdate = $posted["mdml:forceUpdate"];
     	$hash = \Utils::hashFromContents($posted['mdml:payload']);
 	if($loc = $this->resourceSyncService->saveResource($this->path,$posted['mdml:originURI'],$posted['mdml:sourceURI'],$hash)) {
 		$this->storage->upsert($posted,$loc);
+	} elseif($this->forceUpdate) {
+		if($res = $this->resourceSyncService->existingResource($this->path,$posted['mdml:sourceURI'])) {
+			$loc = $this->path."/".$res['ID'];
+			$this->storage->upsert($posted,$loc);
+		}
 	}
 	$this->response = $posted;
   }
@@ -198,7 +212,12 @@ class RESTService {
     $hash = \Utils::hashFromContents($posted['mdml:payload']);
 	if($loc = $this->resourceSyncService->saveResource($this->path,$posted['mdml:originURI'],$posted['mdml:sourceURI'],$hash)) {
 		$this->storage->updateDocument($posted,$loc);
-	}
+	} elseif($this->forceUpdate) {
+               if($res = $this->resourceSyncService->existingResource($this->path,$posted['mdml:sourceURI'])) {
+                      $loc = $this->path."/".$res['ID'];
+                      $this->storage->updataDocument($posted,$loc);
+              }
+       }
 	$this->response = $posted;
   }
 
