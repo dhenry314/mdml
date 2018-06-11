@@ -129,6 +129,7 @@ class ResourceSyncService {
 		}
 	}
 	$sql .= " AND NOT `change` = 'deleted'";
+	$sql .= " ORDER BY `lastmod` desc ";
 	$sql .= " LIMIT " . $paging['offset'].",".$paging['count'];
         $sth = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $sth->execute($params);
