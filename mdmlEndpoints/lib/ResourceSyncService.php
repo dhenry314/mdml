@@ -247,12 +247,14 @@ class ResourceSyncService {
   }
 
   public function existingResource($path,$sourceURI) {
-	$params = array(':path'=>$path,':sourceURI'=>$sourceURI);
-	$sql = "SELECT * FROM `resources` WHERE `path` = :path AND `sourceURI` = :sourceURI";
+	$params = array(':sourceURI'=>$sourceURI);
+	$sql = "SELECT * FROM `resources` WHERE `sourceURI` = :sourceURI";
         $sth = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $sth->execute($params);
-	if($result = $sth->fetch()) {
-		return $result;
+	while($result = $sth->fetch()) {
+		if($result['path'] == $path) {
+		   return $result;
+		}
 	}
 	return FALSE;
   }
