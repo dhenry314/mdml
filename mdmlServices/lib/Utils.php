@@ -296,16 +296,22 @@ class Utils {
         $headers = NULL;
         if($jwt) {
                 $headers = "Authorization: Bearer ".$jwt;
-        }
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $headers ));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($ch);
-        if(curl_errno($ch)){
-              throw new \Exception("Curl error: "  . curl_error($ch));
-        }
-        curl_close($ch);
+        	$ch = curl_init();
+        	curl_setopt($ch, CURLOPT_URL, $url);
+        	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $headers ));
+        	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        	$response = curl_exec($ch);
+        	if(curl_errno($ch)){
+              		throw new \Exception("Curl error: "  . curl_error($ch));
+        	}
+        	curl_close($ch);
+	} else {
+		$response = @file_get_contents($url);
+		if(!$response) {
+			throw new \Exception("Could not get contents from  "  . $url);
+		}
+	}
+
         $result = false;
         try {
                 $result = Utils::jsonToObj($response);
