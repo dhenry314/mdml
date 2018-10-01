@@ -155,16 +155,23 @@ class RESTService {
         return TRUE;
   }
 
-  public function findRecord($query) {
+  public function findRecord($query,$queryStr) {
+        $queryParams = $query;
+  	if(!$query) {
+		$queryParams = new stdclass;
+		$queryParams->offset = 0;
+		$queryParams->count = 1;
+		$queryParams->query = new stdclass;
+		$queryParams->query->{"mdml:".$queryStr['field']} = $queryStr['value'];
+	}
   	$paging = array();
-	if(property_exists($query,'offset')) {
-		$paging['offset'] = $query->offset;
+	if(property_exists($queryParams,'offset')) {
+		$paging['offset'] = $queryParams->offset;
 	}
-	if(property_exists($query,'count')) {
-		$paging['count'] = $query->count;
+	if(property_exists($queryParams,'count')) {
+		$paging['count'] = $queryParams->count;
 	}
-
-  	if($results = $this->storage->getResults($query->query,$paging)) {
+  	if($results = $this->storage->getResults($queryParams->query,$paging)) {
 	      if(count($results)==1) {
 	      	$this->response = $results[0];
 	      } else {
