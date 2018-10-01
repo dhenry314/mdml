@@ -24,6 +24,12 @@ class PushService extends \mdml\Service {
 	} 
 
 	protected function getSourceURI($endpoint,$originURI) {
+	        if(strstr($endpoint,".xml")||strstr($endpoint,".json")) {
+			$parts = explode("/",$endpoint);
+			array_pop($parts);
+			$endpoint = implode("/",$parts);
+			$endpoint .= "/";
+		}
 		$url = $endpoint."?format=json&field=originURI&value=".$originURI;
 		$contents = \mdml\Utils::getFromURL($url,$this->jwt);
 		if(count($contents)==0) return FALSE;
@@ -42,7 +48,7 @@ class PushService extends \mdml\Service {
 		}
 		$this->writeToTarget($original_record,$firstSourceEndpoint,$this->originURI);
 		if(!$firstSourceURI = $this->getSourceURI($firstSourceEndpoint,$this->originURI)) {
-			throw new \mdml\ServiceException("Could not get sourceURI from originURI: " . $this->originURI);
+			throw new \mdml\ServiceException("Could not get sourceURI from originURI: " . $this->originURI );
 		}
 		array_unshift($this->processes,$firstProcess);
 		foreach($this->processes as $nextProcess) {
