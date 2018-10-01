@@ -97,7 +97,7 @@ class EndpointController {
     	if(strlen($this->requestedPath)==0) {
     		return $this->ResourceSyncService->getSitemap('json');
     	} elseif(in_array('_find',$this->paths) || $this->requestedPath == '_find') {
-    		return $this->RESTService->findRecord($this->requestDoc);
+    		return $this->RESTService->findRecord($this->requestDoc,$queryParams);
     	} elseif($this->requestedPath == 'sitemap.xml') {
         return $this->ResourceSyncService->getSitemap($format);
       } elseif(strstr($this->requestedPath,'resourcelist.xml')) {
