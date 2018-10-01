@@ -24,16 +24,14 @@ class PushService extends \mdml\Service {
 	} 
 
 	protected function getSourceURI($endpoint,$originURI) {
-	        if(strstr($endpoint,".xml")||strstr($endpoint,".json")) {
-			$parts = explode("/",$endpoint);
-			array_pop($parts);
-			$endpoint = implode("/",$parts);
-			$endpoint .= "/";
+	        if(!strstr($endpoint,"resourcelist.xml")) {
+			throw new ServiceException("Endpoint MUST end with resourcelist.xml");
 		}
-		$url = $endpoint."_find?format=json&field=originURI&value=".$originURI;
+		$url = $endpoint."?format=json&field=originURI&value=".$originURI;
 		$contents = \mdml\Utils::getFromURL($url,$this->jwt);
-		if(!$contents) return FALSE;
-		return $contents->{"@id"};
+		if(count($contents)==0) return FALSE;
+		if(count($contents)>1) return FALSE;
+		return $contents[0]->loc;
 	}
 
 	public function run() {
