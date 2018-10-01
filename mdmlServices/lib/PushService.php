@@ -30,11 +30,10 @@ class PushService extends \mdml\Service {
 			$endpoint = implode("/",$parts);
 			$endpoint .= "/";
 		}
-		$url = $endpoint."?format=json&field=originURI&value=".$originURI;
+		$url = $endpoint."_find?format=json&field=originURI&value=".$originURI;
 		$contents = \mdml\Utils::getFromURL($url,$this->jwt);
-		if(count($contents)==0) return FALSE;
-		if(count($contents)>1) return FALSE;
-		return $contents[0]->loc;
+		if(!$contents) return FALSE;
+		return $contents->{"mdml:sourceURI"};
 	}
 
 	public function run() {
