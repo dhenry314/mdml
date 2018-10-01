@@ -109,7 +109,7 @@ class PushService extends \mdml\Service {
 		curl_close($ch);
 		$returnObj = json_decode($result);
 		if(property_exists($returnObj,'exception')) {
-			throw new ServiceException($returnObj->exception.": " . $returnObj->message,$errData,"ERROR");
+			throw new ServiceException($returnObj->exception.": " . $returnObj->message);
 		} elseif(!property_exists($returnObj,'mdml:payload')) {
 			throw new ServiceException("Unknown error: Could not ingest. SourceURI: " . $sourceURI);
 		}
